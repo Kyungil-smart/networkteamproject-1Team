@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using Unity.Cinemachine;
+using UnityEngine.Rendering;
 
-public class TEST_PlayerMove : NetworkBehaviour
+public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
 {
     [Header("Move")]
     [SerializeField] float _moveSpeed = 4f;
@@ -12,25 +13,39 @@ public class TEST_PlayerMove : NetworkBehaviour
     [SerializeField] float _rotationSmoothTime = 0.12f;
 
     [Header("Camera")]
-    [SerializeField] GameObject _cameraTarget;
-    [SerializeField] float _topClamp = 70f;
-    [SerializeField] float _bottomClamp = -30f;
+    [SerializeField] GameObject _cameraPos;
+    [SerializeField] SkinnedMeshRenderer _headMesh;
+    [SerializeField] float _upClamp = -40f;
+    [SerializeField] float _downClamp = 70f;
+    //[SerializeField] float _leftClamp = -90f;
+    //[SerializeField] float _rightClamp = 90f;
     [SerializeField] float _mouseSensitivity = 0.3f;
+
+    [Header("Jump")]
+    public float jumpCooldown = 1.5f;
+    float _lastJumpTime;
 
     // 컴포넌트
     Animator _animator;
     CharacterController _controller;
-    Camera _mainCamera;
 
     // 내부 상태
     Vector2 _moveInput;
+    float _initialYaw;
     float _yaw;
     float _pitch;
     float _rotationVelocity;
 
+    // 애니메이션 해시
+    int _animIDSpeed;
+    int _animIDGrounded;
+    int _animIDJump;
+    int _animIDFreeFall;
+    int _animIDMotionSpeed;
+
     // 중력
     float _verticalVelocity;
-    public float gravity = -9.81f;
+    float _gravity = -9.81f;
 
     public BattleInputReader input;
 #if UNITY_EDITOR
@@ -48,6 +63,7 @@ public class TEST_PlayerMove : NetworkBehaviour
         }
     }
 #endif
+
     public override void OnNetworkSpawn()
     {
         if (!IsOwner) return;
@@ -56,45 +72,54 @@ public class TEST_PlayerMove : NetworkBehaviour
         input.onMove += OnMove;
         input.onJump += OnJump;
 
-        _mainCamera = Camera.main;
-        _yaw = _cameraTarget.transform.rotation.eulerAngles.y;
+        _initialYaw = _cameraPos.transform.rotation.eulerAngles.y;
+        _yaw = _initialYaw;
 
         SetupCinemachineCamera();
+
+        this.RegisterNetworkUpdate(NetworkUpdateStage.Update);
     }
 
     public override void OnNetworkDespawn()
     {
         if (!IsOwner) return;
+
         input.onMove -= OnMove;
         input.onJump -= OnJump;
+        input.Disable();
+
+        this.UnregisterNetworkUpdate(NetworkUpdateStage.Update);
+    }
+
+    public void NetworkUpdate(NetworkUpdateStage updateStage)
+    {
+        if (!IsOwner) return;
+
+        if (updateStage == NetworkUpdateStage.Update)
+        {
+            MovePlayer();
+            ApplyGravity();
+            RotateCamera();
+
+            if (Keyboard.current.escapeKey.wasPressedThisFrame) // ESC 키로 게임 종료 (임시)
+            {
+                NetworkManager.Singleton.Shutdown();
+                LinkManager.Instance.isInGame = false;
+                UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+            }
+        }
     }
 
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
         _animator = GetComponent<Animator>();
-    }
 
-    private void Update()
-    {
-        if (!IsOwner) return;
-
-        ApplyGravity();
-        MovePlayer();
-
-        // ESC를 누르면 나가기 (테스트용)
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            NetworkManager.Singleton.Shutdown();
-            LinkManager.Instance.isInGame = false;
-            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
-        }
-    }
-
-    private void LateUpdate()
-    {
-        if (!IsOwner) return;
-        RotateCamera();
+        _animIDSpeed = Animator.StringToHash("Speed");
+        _animIDGrounded = Animator.StringToHash("Grounded");
+        _animIDJump = Animator.StringToHash("Jump");
+        _animIDFreeFall = Animator.StringToHash("FreeFall");
+        _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
     }
 
     // ────────────────────────────────────────────
@@ -102,50 +127,89 @@ public class TEST_PlayerMove : NetworkBehaviour
     {
         GameObject camObj = GameObject.FindWithTag("GameController");
         camObj.TryGetComponent(out CinemachineCamera vcam);
-        camObj.transform.SetParent(_cameraTarget.transform, false);
-        vcam.Target.TrackingTarget = transform;
+        camObj.transform.SetParent(_cameraPos.transform, false);
+        camObj.transform.localPosition = Vector3.zero;
+        camObj.transform.localRotation = Quaternion.identity;
+        
+        // 자기 머리 보이지 않도록 설정
+        _headMesh.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
+        //Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void OnMove(Vector2 value) => _moveInput = value;
-    private void OnJump() { if (_controller.isGrounded) _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * gravity); }
+
+    private void OnJump()
+    {
+        if (Time.time >= _lastJumpTime + jumpCooldown)
+        {
+            _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+            _lastJumpTime = Time.time;
+            _animator.SetBool(_animIDJump, true);
+        }
+    }
 
     private void MovePlayer()
     {
         float targetSpeed = _moveInput == Vector2.zero ? 0f : _moveSpeed * (input.isSprint ? _sprintMultiplier : 1f);
 
-        // 카메라 기준 이동 방향
-        Vector3 inputDir = new Vector3(_moveInput.x, 0f, _moveInput.y).normalized;
-        if (_moveInput != Vector2.zero)
-        {
-            float targetAngle = Mathf.Atan2(inputDir.x, inputDir.z) * Mathf.Rad2Deg
-                                + _mainCamera.transform.eulerAngles.y;
-            float smoothAngle = Mathf.SmoothDampAngle(
-                transform.eulerAngles.y, targetAngle, ref _rotationVelocity, _rotationSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
-            inputDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-        }
+        // 캐릭터가 카메라 방향 바라보게
+        float cameraYaw = _cameraPos.transform.eulerAngles.y;
+        float smoothAngle = Mathf.SmoothDampAngle(
+            transform.eulerAngles.y, cameraYaw, ref _rotationVelocity, _rotationSmoothTime);
+        transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
 
-        _controller.Move(inputDir.normalized * (targetSpeed * Time.deltaTime)
+        Vector3 inputDir = (transform.right * _moveInput.x + transform.forward * _moveInput.y).normalized;
+
+        _controller.Move(inputDir * (targetSpeed * Time.deltaTime)
                          + Vector3.up * (_verticalVelocity * Time.deltaTime));
 
-        _animator.SetFloat("Speed", targetSpeed);
+        _animator.SetFloat(_animIDSpeed, targetSpeed);
+        
+        // 애니 블렌드 트리 속도 제어
+        float MotionSpeed = _moveInput == Vector2.zero ? 0f : 1f;
+        _animator.SetFloat(_animIDMotionSpeed, MotionSpeed);
     }
 
     private void ApplyGravity()
     {
-        if (_controller.isGrounded && _verticalVelocity < 0f)
-            _verticalVelocity = -2f;
+        if (_controller.isGrounded && _verticalVelocity <= 0.0f)
+        {
+            _animator.SetBool(_animIDGrounded, true);
+            _animator.SetBool(_animIDFreeFall, false);
+            _animator.SetBool(_animIDJump, false);
+
+            if (_verticalVelocity < 0f)
+                _verticalVelocity = -2f;
+        }
         else
-            _verticalVelocity += gravity * Time.deltaTime;
+        {
+            _animator.SetBool(_animIDGrounded, false);
+            if (_verticalVelocity < 0f)
+                _animator.SetBool(_animIDFreeFall, true);
+
+            _verticalVelocity += _gravity * Time.deltaTime;
+        }
     }
 
     private void RotateCamera()
     {
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+        
         _yaw += mouseDelta.x * _mouseSensitivity;
-        _pitch -= mouseDelta.y * _mouseSensitivity;
-        _pitch = Mathf.Clamp(_pitch, _bottomClamp, _topClamp);
+        //_yaw = Mathf.Clamp(_yaw, _initialYaw + _leftClamp, _initialYaw + _rightClamp);
 
-        _cameraTarget.transform.rotation = Quaternion.Euler(_pitch, _yaw, 0f);
+        _pitch -= mouseDelta.y * _mouseSensitivity;
+        _pitch = Mathf.Clamp(_pitch, _upClamp, _downClamp);
+
+        _cameraPos.transform.rotation = Quaternion.Euler(_pitch, _yaw, 0f);
+    }
+
+    // 애니메이션 이벤트 리시버 (추후 사운드 재생 시)
+    private void OnFootstep(AnimationEvent animationEvent)
+    {
+    }
+
+    private void OnLand(AnimationEvent animationEvent)
+    {
     }
 }

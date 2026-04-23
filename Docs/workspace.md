@@ -72,6 +72,8 @@ Assets/
 │  ├─ Prefabs/
 │  ├─ Scenes/
 │  └─ Scripts/
+│  │  ├─ Core/
+│  │  └─ Model/
 ├─ Settings/         유니티 세팅
 │  ├─ Editor/           에디터 전용 스크립트 (빌드제외)
 │  ├─ Input/

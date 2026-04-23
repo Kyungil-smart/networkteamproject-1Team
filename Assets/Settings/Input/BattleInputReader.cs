@@ -26,6 +26,11 @@ public class BattleInputReader : ScriptableObject, IBattleActions
         }
         inputAction.Enable();
     }
+    public void Disable()
+    {
+        inputAction.Disable();
+    }
+
 
     public void OnMove(InputAction.CallbackContext context)
     {

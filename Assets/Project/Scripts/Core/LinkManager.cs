@@ -31,7 +31,7 @@ public partial class LinkManager : MonoBehaviour
         // 자기 자신이 해제된 경우 = 서버와의 연결이 끊김 = Host 이탈
         if (clientId != NetworkManager.Singleton.LocalClientId) return;
 
-        Debug.Log("[Disconnect] 서버와의 연결이 끊겼습니다. 연결 씬으로 복귀합니다.");
+        Debug.Log("[LinkManager] 서버와의 연결이 끊겼습니다. 연결 씬으로 복귀합니다.");
 
         NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene(0);
