@@ -41,7 +41,7 @@
 ---
 
 8. 데이터 정리
-- Imports 폴더의 에셋 공유는 Google Drive 시용합니다
+- Imports 폴더의 에셋 공유는 [Google Drive](https://drive.google.com/drive/folders/1izjsutvxADilHC09RIWbx_3Hiw-QuYHc) 시용합니다
 - 폴더 구조를 숙지하고 활용합니다 (WIP에 개인작업 폴더 자유롭게 쓰다가 Project폴더에 정리등)
  ---
 
