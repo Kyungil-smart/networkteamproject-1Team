@@ -3,21 +3,17 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public enum TeamType
-{
-    A,
-    B
-}
+public enum TeamType { None, A, B }
 
+// 플레이어 스폰과 팀 배정 담당
+// 팀 데이터는 각 PlayerRole.Team (NetworkVariable) 에 보관
 public class PlayerSpawnManager : NetworkBehaviour
 {
-    [SerializeField] GameObject _playerPrefab;    // NetworkObject 가 붙은 플레이어 프리팹
+    [SerializeField] GameObject _playerPrefab;
     [SerializeField] Transform[] _spawnPoints;
-    [SerializeField, Min(1)] int _targetTeamBCount = 1;
+    [SerializeField, Min(1)] int _startTeamBCount = 1;
 
-    public Dictionary<ulong, TeamType> assignTeams = new Dictionary<ulong, TeamType>();
-
-    public override void OnNetworkSpawn()
+    protected override void OnNetworkPostSpawn()
     {
         if (!IsServer) return;
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SpawnAllPlayers;
@@ -28,68 +24,46 @@ public class PlayerSpawnManager : NetworkBehaviour
         if (!IsServer) return;
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SpawnAllPlayers;
     }
-    //---- TEST ----
-    public void SpawnAllPlayers() // 테스트용 오버로드
-    {
-        SpawnAllPlayers(
-            SceneManager.GetActiveScene().name,
-            LoadSceneMode.Single,
-            new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds),
-            new List<ulong>());
-    }
-    //----------------
-    public void SpawnAllPlayers(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
-    {
-        // 팀 배정 진행
-        AssignTeams(clientsCompleted);
 
-        // 모든 클라이언트가 씬 로드 후, 캐릭터를 스폰시켜줍니다
-        int index = 0;
-        foreach (ulong clientId in clientsCompleted)
+    void SpawnAllPlayers(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        // 셔플로 팀 배정 결정
+        List<ulong> shuffled = new List<ulong>(clientsCompleted);
+        Shuffle(shuffled);
+        int teamBCount = Mathf.Min(_startTeamBCount, shuffled.Count);
+
+        Dictionary<ulong, TeamType> teamMap = new Dictionary<ulong, TeamType>();
+        for (int i = 0; i < shuffled.Count; i++)
+            teamMap[shuffled[i]] = i < teamBCount ? TeamType.B : TeamType.A;
+
+        // 스폰 후 PlayerRole에 팀 직접 주입
+        for (int i = 0; i < clientsCompleted.Count; i++)
         {
-            Transform sp = _spawnPoints[index % _spawnPoints.Length];
+            ulong clientId = clientsCompleted[i];
+            Transform sp = _spawnPoints[i % _spawnPoints.Length];
 
-            TeamType team = assignTeams[clientId];
             GameObject instance = Instantiate(_playerPrefab, sp.position, sp.rotation);
             instance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
 
-            Debug.Log($"[Spawn] Player {clientId} ({team}) → {sp.position}");
-            index++;
+            TeamType team = teamMap[clientId];
+            instance.GetComponent<PlayerRole>().Team.Value = team;
+
+            Debug.Log($"[Spawn] Player {clientId} ({team})");
         }
     }
-    void AssignTeams(List<ulong> clients)
+    public void SpawnAllPlayers()
     {
-        assignTeams.Clear();
+        SpawnAllPlayers(SceneManager.GetActiveScene().name, LoadSceneMode.Single,
+            new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds), new List<ulong>());
+    }
 
-        List<ulong> randomizedClients = new List<ulong>(clients);
-        Shuffle(randomizedClients);
-
-        for (int i = 0; i < randomizedClients.Count; i++)
+    void Shuffle(List<ulong> list)
+    {
+        System.Random rng = new System.Random();
+        for (int i = list.Count - 1; i > 0; i--)
         {
-            TeamType team = i < _targetTeamBCount ? TeamType.B : TeamType.A;
-            assignTeams[randomizedClients[i]] = team;
+            int j = rng.Next(i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
         }
-    }
-    void Shuffle(List<ulong> clientIds)
-    {
-        System.Random random = new System.Random();
-        for (int i = clientIds.Count - 1; i > 0; i--)
-        {
-            int swapIndex = random.Next(i + 1);
-            (clientIds[i], clientIds[swapIndex]) = (clientIds[swapIndex], clientIds[i]);
-        }
-    }
-
-    // 외부에서 플레이어의 팀 정보를 조회
-    //public bool TryGetTeam(ulong clientId, out TeamType team)
-    //{
-    //    return assignTeams.TryGetValue(clientId, out team);
-    //}
-
-    // 외부에서 플레이어의 팀 정보를 간단히 조회
-    // 만약 A라면 false, B라면 true 반환
-    public bool IsTeamB(ulong clientId)
-    {
-        return assignTeams.TryGetValue(clientId, out TeamType team) && team == TeamType.B;
     }
 }

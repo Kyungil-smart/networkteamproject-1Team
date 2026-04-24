@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8842125791262389722}
   - component: {fileID: 2199726746036762208}
   m_Layer: 0
-  m_Name: EDITOR_NetworkTester
+  m_Name: TEST_NetworkTester
   m_TagString: EditorOnly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

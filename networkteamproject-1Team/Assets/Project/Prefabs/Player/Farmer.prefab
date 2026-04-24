@@ -405,6 +405,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 522943fc9652c81498c52791fa1b5057, type: 3}
       insertIndex: -1
       addedObject: {fileID: -2857971383739610394}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 522943fc9652c81498c52791fa1b5057, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -13905444169321746}
   m_SourcePrefab: {fileID: 100100000, guid: 522943fc9652c81498c52791fa1b5057, type: 3}
 --- !u!4 &2717062347123946360 stripped
 Transform:
@@ -576,6 +579,24 @@ MonoBehaviour:
   _mouseSensitivity: 0.09
   jumpCooldown: 1.5
   input: {fileID: 11400000, guid: f3dea7d9139022049872a40ab03fa674, type: 2}
+--- !u!114 &-13905444169321746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3386462157017786818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 969eb20c531db8e48ae1829e12a028c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRole
+  ShowTopMostFoldoutHeaderGroup: 1
+  Team:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!137 &4686149465804709731 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 7149117711173880816, guid: 522943fc9652c81498c52791fa1b5057, type: 3}
