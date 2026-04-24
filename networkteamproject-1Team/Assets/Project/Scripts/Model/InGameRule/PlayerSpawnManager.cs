@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,8 +7,8 @@ namespace InGameRule
 {
     public class PlayerSpawnManager : NetworkBehaviour
     {
-        [SerializeField] private GameObject _playerPrefab;    // NetworkObject °¡ ºÙÀº ÇÃ·¹ÀÌ¾î ÇÁ¸®ÆÕ
-        [SerializeField] private Transform[] _spawnPoints;
+        [SerializeField] GameObject _playerPrefab;    // NetworkObject ê°€ ë¶™ì€ í”Œë ˆì´ì–´ í”„ë¦¬íŒ¹
+        [SerializeField] Transform[] _spawnPoints;
 
         public override void OnNetworkSpawn()
         {
@@ -24,7 +24,7 @@ namespace InGameRule
 
         private void SpawnAllPlayers(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
         {
-            // ¸ğµç Å¬¶óÀÌ¾ğÆ®°¡ ¾À ·Îµå ÈÄ, Ä³¸¯ÅÍ¸¦ ½ºÆù½ÃÄÑÁİ´Ï´Ù
+            // ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ê°€ ì”¬ ë¡œë“œ í›„, ìºë¦­í„°ë¥¼ ìŠ¤í°ì‹œì¼œì¤ë‹ˆë‹¤
             int index = 0;
             foreach (ulong clientId in clientsCompleted)
             {
@@ -33,7 +33,7 @@ namespace InGameRule
                 GameObject instance = Instantiate(_playerPrefab, sp.position, sp.rotation);
                 instance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
 
-                Debug.Log($"[Spawn] Player {clientId} ¡æ {sp.position}");
+                Debug.Log($"[Spawn] Player {clientId} â†’ {sp.position}");
                 index++;
             }
         }
