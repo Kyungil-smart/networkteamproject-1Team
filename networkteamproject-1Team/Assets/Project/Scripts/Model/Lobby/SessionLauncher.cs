@@ -9,7 +9,7 @@ namespace Lobby
     {
         [SerializeField] TMP_Text _loadingText;
         const int MIN_PLAYERS_TO_START = 2;
-        static readonly string[] SceneNames = { "Map1" };
+        static readonly string[] sceneNames = { "Map1" };
 
         public BattleInputReader input;
 #if UNITY_EDITOR
@@ -78,7 +78,7 @@ namespace Lobby
             }
 
             ShowLoadingClientRpc();
-            string sceneName = SceneNames[index];
+            string sceneName = sceneNames[index];
             NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
 
