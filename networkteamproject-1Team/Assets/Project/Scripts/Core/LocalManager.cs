@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,7 +9,14 @@ public partial class LocalManager : MonoBehaviour
     public static LocalManager Instance;
 
     public bool isInGame;
-    public bool IamB;
+
+    public event Action OnIamBSet;
+    bool _iamB;
+    public bool IamB
+    {
+        get => _iamB;
+        set { _iamB = value; if (value) OnIamBSet?.Invoke(); }
+    }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] // 씬 시작 전에 만들기
     private static void CreateInstance()

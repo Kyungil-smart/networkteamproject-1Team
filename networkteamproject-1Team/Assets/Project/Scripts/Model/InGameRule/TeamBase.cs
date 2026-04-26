@@ -57,5 +57,3 @@ public abstract class TeamBase : NetworkBehaviour
 
     protected abstract void OnTeamSetup(TeamType team);
 }
-
-
