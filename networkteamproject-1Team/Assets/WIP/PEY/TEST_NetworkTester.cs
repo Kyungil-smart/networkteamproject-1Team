@@ -6,10 +6,10 @@ using UnityEngine.InputSystem;
 // 에디터 상에서 네트워크 기능 테스트용 코드
 public class TEST_NetworkTester : NetworkBehaviour
 {
-    [SerializeField] PlayerSpawnManager PSM;
+    [SerializeField] TeamManager PSM;
     private void Reset()
     {
-        PSM = FindFirstObjectByType<PlayerSpawnManager>();
+        PSM = FindFirstObjectByType<TeamManager>();
     }
 
     private void Update()
