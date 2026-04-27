@@ -11,12 +11,15 @@ public class MonsterAttackState : IState
     
     public void Enter()
     {
-        
+        _monsterController.MonsterAI.Agent.ResetPath();
     }
 
     public void Update()
     {
-
+        if (_monsterController.DistanceToPlayer() > _monsterController.MonsterData.attackRange)
+        {
+            _monsterController.ChangeState(StateType.Chase);
+        }
     }
 
     public void Exit()

@@ -3,6 +3,7 @@ using UnityEngine;
 public class MonsterPatrolState : IState
 {
     private MonsterContorller _monsterController;
+    private int _patrolIndex;
 
     public MonsterPatrolState(MonsterContorller monsterController)
     {
@@ -11,12 +12,17 @@ public class MonsterPatrolState : IState
     
     public void Enter()
     {
+        _monsterController.MonsterAI.Agent.ResetPath();
     }
 
     public void Update()
     {
-        _monsterController.MonsterAI.Target = _monsterController.DetectPlayer();
-
+        if (!_monsterController.MonsterAI.Agent.pathPending &&
+            _monsterController.MonsterAI.Agent.remainingDistance < 0.2f)
+        {
+            Patrol();
+        }
+        
         if (_monsterController.MonsterAI.Target != null)
         {
             _monsterController.ChangeState(StateType.Chase);
@@ -25,6 +31,15 @@ public class MonsterPatrolState : IState
 
     public void Exit()
     {
+        
     }
-    
+
+    private void Patrol()
+    {
+        if (_monsterController.MonsterData.patrolPoints == null) return;
+        
+        _monsterController.MonsterAI.Agent.SetDestination(
+            _monsterController.MonsterData.patrolPoints[_patrolIndex].transform.position);
+        _patrolIndex = (_patrolIndex + 1) % _monsterController.MonsterData.patrolPoints.Count;
+    }
 }

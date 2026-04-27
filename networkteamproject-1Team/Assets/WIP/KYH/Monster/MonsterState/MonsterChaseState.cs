@@ -11,25 +11,25 @@ public class MonsterChaseState : IState
     
     public void Enter()
     {
+        _monsterController.MonsterAI.IsDetected = true;
     }
 
     public void Update()
     {
-        float dis = Vector3.Distance(_monsterController.transform.position, _monsterController.MonsterAI.Target.position);
-
-        if (dis > _monsterController.MonsterData.attackRange)
+        if (_monsterController.MonsterAI.Target == null)
         {
-            _monsterController.MonsterAI.ChasePlayer(_monsterController.MonsterAI.Target);
+            _monsterController.ChangeState(StateType.Patrol);
+            return;
         }
-        else
+
+        if (_monsterController.DistanceToPlayer() <= _monsterController.MonsterData.attackRange)
         {
-            _monsterController.MonsterAI.Agent.ResetPath();
-            // 클라이언트RCP 공격처리
-            
+            _monsterController.ChangeState(StateType.Attack);
         }
     }
 
     public void Exit()
     {
+        _monsterController.MonsterAI.IsDetected = false;
     }
 }

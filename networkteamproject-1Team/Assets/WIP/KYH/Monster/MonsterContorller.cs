@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
@@ -58,13 +59,14 @@ public class MonsterContorller : NetworkBehaviour
         ChaseState = new MonsterChaseState(this);
         AttackState = new MonsterAttackState(this);
         
+        if (MonsterData.speed != 0f) MonsterAI.Agent.speed = MonsterData.speed;
         _state.ChangeState(IdleState);
         currentState.Value = StateType.Idle;
     }
 
     public Transform DetectPlayer()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position, MonsterData.chaseRange, _layerMask);
+        Collider[] colliders = Physics.OverlapSphere(transform.position + MonsterData.offset, MonsterData.chaseRange, _layerMask);
 
         Transform target = null;
         float minDistance = float.MaxValue;
@@ -101,5 +103,18 @@ public class MonsterContorller : NetworkBehaviour
         }
         
         currentState.Value = newState;
+    }
+
+    public float DistanceToPlayer()
+    {
+        return Vector3.Distance(transform.position, MonsterAI.Target.position);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(transform.position + MonsterData.offset, MonsterData.chaseRange);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(transform.position + MonsterData.offset, MonsterData.attackRange);
     }
 }
