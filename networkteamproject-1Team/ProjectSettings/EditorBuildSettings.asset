@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/WIP/PEY/_LOBBY_TEST.unity
     guid: 628ad765dbbb8bf4b9dcb51f9710e0c3
   - enabled: 1
-    path: Assets/WIP/PEY/Map1.unity
-    guid: b7c70d2a7a78c064ba47b5ff795794f4
+    path: Assets/WIP/PEY/BattleSystem/Map1_Battle.unity
+    guid: c4b65c931f2d5ca459f32b0630adc394
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: a986ca7082d39504f89279fc1d242f7d, type: 3}
   m_UseUCBPForAssetBundles: 0
