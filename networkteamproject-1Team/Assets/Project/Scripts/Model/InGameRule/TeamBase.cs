@@ -10,9 +10,7 @@ public abstract class TeamBase : NetworkBehaviour
     const int LAYER_B = 11;
 
     // 스폰 직후 팀 결정
-    public NetworkVariable<TeamType> Team = new NetworkVariable<TeamType>(TeamType.None,
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server);
+    public NetworkVariable<TeamType> Team = new NetworkVariable<TeamType>(TeamType.None);
 
     public override void OnNetworkSpawn()
     {
