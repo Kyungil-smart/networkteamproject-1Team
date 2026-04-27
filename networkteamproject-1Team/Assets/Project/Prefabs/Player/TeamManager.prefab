@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1093822834009677046}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.099999994, y: 0.099999905, z: -2.3299992}
+  m_LocalPosition: {x: -0.099999994, y: 0.13899994, z: -3.3479998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -56,7 +56,7 @@ Transform:
   m_GameObject: {fileID: 2419215533358128432}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.79999995, y: 0.099999905, z: -3.3299992}
+  m_LocalPosition: {x: 0.79999995, y: 0.13899994, z: -4.3479996}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -87,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 2465891181657602377}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.01, y: 0.099999905, z: -4.2}
+  m_LocalPosition: {x: 0.01, y: 0.139, z: -5.218}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -118,7 +118,7 @@ Transform:
   m_GameObject: {fileID: 2858678903513283173}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.76, y: 0.099999905, z: -3.1399992}
+  m_LocalPosition: {x: -2.76, y: 0.13899994, z: -4.158}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -149,7 +149,7 @@ Transform:
   m_GameObject: {fileID: 6100117846570119536}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.82, y: 0.099999905, z: -4.359999}
+  m_LocalPosition: {x: -1.82, y: 0.13899994, z: -5.378}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -166,6 +166,7 @@ GameObject:
   - component: {fileID: 506478036429888054}
   - component: {fileID: 6097040077253655725}
   - component: {fileID: 3441935513908701369}
+  - component: {fileID: 1658008972141709227}
   m_Layer: 0
   m_Name: TeamManager
   m_TagString: Untagged
@@ -206,7 +207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3635756884
+  GlobalObjectIdHash: 254917868
   InScenePlacedSourceGlobalObjectIdHash: 1902990976
   DeferredDespawnTick: 0
   Ownership: 1
@@ -243,6 +244,19 @@ MonoBehaviour:
   - {fileID: 938788222672293061}
   _startTeamBCount: 1
   ActivePlayers: []
+--- !u!114 &1658008972141709227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8670392139513506553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5065ced3bcacd94f89d42fba1e737bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Battle.BattleManager
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &8886919161004434004
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,7 +282,7 @@ Transform:
   m_GameObject: {fileID: 8886919161004434004}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.62, y: 0.099999905, z: -2.1599991}
+  m_LocalPosition: {x: -1.62, y: 0.13899994, z: -3.1779997}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

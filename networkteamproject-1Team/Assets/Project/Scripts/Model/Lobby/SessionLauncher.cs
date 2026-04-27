@@ -50,6 +50,7 @@ namespace Lobby
                 input.on1 -= OnScene1;
                 //input.on2 -= OnScene2;
                 //input.on3 -= OnScene3;
+                input.Disable();
             }
         }
 
