@@ -145,6 +145,11 @@ Assets/Project/Scripts/Player/
    └ IDamageable.cs
 ```
 
+draw.io를 통해 사전 구조 설계.
+스크립트를 작성하기 앞서 시행착오를 줄이고 유지보수 및 협업에 편한 구조를 만들기 위함.
+
+![alt text](Resources/PlayerController_Architecture.png)
+
 #### Fake Shadow (URP Decal Projector)
 
 팀원이 테스트로 제작한 플레이어 동작 테스트 중, 그림자 렌더링 관련 연출을 URP Decal Projector로 처리하기로 결정.
@@ -159,7 +164,6 @@ Assets/Project/Scripts/Player/
   - 아래로 Ray → Ground 레이어 충돌 거리 측정
   - 설정한 최대 높이 비례로 `fadeFactor` 조절 → 점프 시 그림자가 옅어짐
 - 정상 동작 확인
-
 
 ---
 ## 작업 일지 양식
