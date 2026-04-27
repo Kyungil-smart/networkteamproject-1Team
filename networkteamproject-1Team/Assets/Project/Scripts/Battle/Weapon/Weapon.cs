@@ -1,0 +1,90 @@
+using Unity.Netcode;
+using UnityEngine;
+
+namespace Battle
+{
+    public class Weapon : NetworkBehaviour
+    {
+        public enum State
+        {
+            None, Ready,
+            //Empty, Reloading,
+        }
+        State _state;
+        public WeaponSO weaponSO;
+
+        //public int ammoRemain;
+        //public int ammoInMag;
+        //연출필드(TODO)
+
+        [SerializeField] Transform _attackPoint;
+        float _lastAttackTime;
+
+        public BattleInputReader input;
+#if UNITY_EDITOR
+        private void Reset()
+        {
+            string[] guids = UnityEditor.AssetDatabase.FindAssets("t:BattleInputReader");
+            if (guids.Length > 0)
+            {
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                input = UnityEditor.AssetDatabase.LoadAssetAtPath<BattleInputReader>(path);
+            }
+            string[] guids2 = UnityEditor.AssetDatabase.FindAssets("t:WeaponSO");
+            if (guids2.Length > 0)
+            {
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids2[0]);
+                weaponSO = UnityEditor.AssetDatabase.LoadAssetAtPath<WeaponSO>(path);
+            }
+        }
+#endif
+        public override void OnNetworkSpawn()
+        {
+            if (!IsOwner) return;
+            _state = State.Ready;
+            input.Enable();
+            input.onAttack += TryAttack;
+        }
+        public override void OnNetworkDespawn()
+        {
+            if (!IsOwner) return;
+            input.onAttack -= TryAttack;
+        }
+
+        public void TryAttack()
+        {
+            if (_state == State.Ready && Time.time >= _lastAttackTime + weaponSO.cooltime)
+            {
+                _lastAttackTime = Time.time;
+                Attack();
+            }
+        }
+        void Attack()
+        {
+            if (!Physics.Raycast(_attackPoint.position, transform.forward, out RaycastHit hit, weaponSO.range)) return;
+            Debug.Log($"부딪힘: {hit.collider}");
+
+            NetworkObject targetNetObj = hit.collider.GetComponent<NetworkObject>();
+            if (targetNetObj == null) return;
+
+            AttackServerRpc(targetNetObj.NetworkObjectId, weaponSO.damage);
+        }
+
+        [ServerRpc]
+        void AttackServerRpc(ulong targetId, int damage)
+        {
+            if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var targetNetObj)) return;
+            if (targetNetObj.TryGetComponent(out IDamageable damageable))
+                damageable.TakeDamage(damage);
+
+            AttackClientRpc(OwnerClientId, damage, targetNetObj.OwnerClientId);
+        }
+
+        [ClientRpc]
+        void AttackClientRpc(ulong attackerId, int damage, ulong targetId)
+        {
+            Debug.Log($"[Weapon] 공격자={attackerId}, 피해자={targetId}, damage={damage}");
+            // TODO: 공격 사운드 재생, 타격 이펙트 등
+        }
+    }
+}

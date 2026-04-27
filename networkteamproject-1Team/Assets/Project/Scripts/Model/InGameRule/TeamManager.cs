@@ -44,10 +44,10 @@ public class TeamManager : NetworkBehaviour
         for (int i = 0; i < clientsCompleted.Count; i++)
         {
             ulong clientId = clientsCompleted[i];
-            TeamType team  = teamMap[clientId];
-            Transform sp   = _spawnPoints[i % _spawnPoints.Length];
+            TeamType team = teamMap[clientId];
+            Transform sp = _spawnPoints[i % _spawnPoints.Length];
 
-            GameObject prefab   = team == TeamType.B ? _playerPrefabB : _playerPrefabA;
+            GameObject prefab = team == TeamType.B ? _playerPrefabB : _playerPrefabA;
             GameObject instance = Instantiate(prefab, sp.position, sp.rotation);
             instance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
 
@@ -55,7 +55,15 @@ public class TeamManager : NetworkBehaviour
             role.Team.Value = team;
             ActivePlayers.Add(role);
 
+            // 오너 클라이언트에게 직접 올바른 위치로 텔레포트하라고 명령
+            ClientRpcParams rpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams { TargetClientIds = new[] { clientId } }
+            };
+            role.ForceTeleportClientRpc(sp.position, sp.rotation, rpcParams);
+
             Debug.Log($"[Spawn] Player {clientId} ({team})");
+
         }
     }
 
