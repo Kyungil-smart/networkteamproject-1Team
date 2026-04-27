@@ -59,7 +59,7 @@ namespace Lobby
 
         private void OnClientConnected(ulong clientId)
         {
-            if (LinkManager.Instance.isInGame) return;
+            if (LocalManager.Instance.isInGame) return;
 
             int count = NetworkManager.Singleton.ConnectedClientsIds.Count;
             Debug.Log($"[Session] 현재 접속자: {count}/{MIN_PLAYERS_TO_START}");
@@ -68,7 +68,7 @@ namespace Lobby
         private void TryLoadScene(int index)
         {
             if (!IsServer) return;
-            if (LinkManager.Instance.isInGame) return;
+            if (LocalManager.Instance.isInGame) return;
 
             int count = NetworkManager.Singleton.ConnectedClientsIds.Count;
             if (count < MIN_PLAYERS_TO_START)
@@ -85,7 +85,7 @@ namespace Lobby
         [ClientRpc]
         void ShowLoadingClientRpc()
         {
-            LinkManager.Instance.isInGame = true;
+            LocalManager.Instance.isInGame = true;
             _loadingText.gameObject.SetActive(true); // 테스트용 로딩 보이기
         }
     }

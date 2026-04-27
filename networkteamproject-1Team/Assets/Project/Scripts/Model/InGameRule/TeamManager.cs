@@ -3,15 +3,18 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public enum TeamType { None, A, B }
-
 // 플레이어 스폰과 팀 배정 담당
-// 팀 데이터는 각 PlayerRole.Team (NetworkVariable) 에 보관
-public class PlayerSpawnManager : NetworkBehaviour
+// 팀 데이터는 각 TeamBase.Team (NetworkVariable) 에 보관
+// 스폰된 플레이어 목록을 ActivePlayers 로 관리
+public class TeamManager : NetworkBehaviour
 {
-    [SerializeField] GameObject _playerPrefab;
+    [SerializeField] GameObject _playerPrefabA;  // TeamA 부착 프리팹
+    [SerializeField] GameObject _playerPrefabB;  // TeamB 부착 프리팹
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField, Min(1)] int _startTeamBCount = 1;
+
+    // 서버 기준 스폰된 플레이어 목록 (서버 전용)
+    public List<TeamBase> ActivePlayers = new();
 
     protected override void OnNetworkPostSpawn()
     {
@@ -23,6 +26,7 @@ public class PlayerSpawnManager : NetworkBehaviour
     {
         if (!IsServer) return;
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SpawnAllPlayers;
+        ActivePlayers.Clear();
     }
 
     void SpawnAllPlayers(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
@@ -36,26 +40,34 @@ public class PlayerSpawnManager : NetworkBehaviour
         for (int i = 0; i < shuffled.Count; i++)
             teamMap[shuffled[i]] = i < teamBCount ? TeamType.B : TeamType.A;
 
-        // 스폰 후 PlayerRole에 팀 직접 주입
+        // 팀에 맞는 프리팹으로 스폰 후 PlayerRoleBase에 팀 주입
         for (int i = 0; i < clientsCompleted.Count; i++)
         {
             ulong clientId = clientsCompleted[i];
-            Transform sp = _spawnPoints[i % _spawnPoints.Length];
+            TeamType team  = teamMap[clientId];
+            Transform sp   = _spawnPoints[i % _spawnPoints.Length];
 
-            GameObject instance = Instantiate(_playerPrefab, sp.position, sp.rotation);
+            GameObject prefab   = team == TeamType.B ? _playerPrefabB : _playerPrefabA;
+            GameObject instance = Instantiate(prefab, sp.position, sp.rotation);
             instance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
 
-            TeamType team = teamMap[clientId];
-            instance.GetComponent<PlayerRole>().Team.Value = team;
+            var role = instance.GetComponent<TeamBase>();
+            role.Team.Value = team;
+            ActivePlayers.Add(role);
 
             Debug.Log($"[Spawn] Player {clientId} ({team})");
         }
     }
-    public void SpawnAllPlayers()
+
+    public void SpawnAllPlayers() // 테스트용 간편 호출
     {
         SpawnAllPlayers(SceneManager.GetActiveScene().name, LoadSceneMode.Single,
             new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds), new List<ulong>());
     }
+
+    // 팀별 플레이어 목록 조회
+    public List<TeamBase> GetPlayersByTeam(TeamType team)
+        => ActivePlayers.FindAll(r => r.Team.Value == team);
 
     void Shuffle(List<ulong> list)
     {

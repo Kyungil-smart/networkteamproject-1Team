@@ -8,7 +8,7 @@ public class TEST_CubeMove : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsOwner || LinkManager.Instance.isInGame) return;
+        if (!IsOwner || LocalManager.Instance.isInGame) return;
 
         if (Keyboard.current.aKey.isPressed)
         {

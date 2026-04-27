@@ -1,19 +1,28 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// 자동으로 생성되는 싱글톤매니져, 컴포넌트를 사전에 세팅하지 않는 연결상태 관리
-public partial class LinkManager : MonoBehaviour
+// 자동생성 싱글톤, 로컬정보 관리
+public partial class LocalManager : MonoBehaviour
 {
-    public static LinkManager Instance;
+    public static LocalManager Instance;
 
     public bool isInGame;
+
+    public event Action OnIamBSet;
+    bool _iamB;
+    public bool IamB
+    {
+        get => _iamB;
+        set { _iamB = value; if (value) OnIamBSet?.Invoke(); }
+    }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] // 씬 시작 전에 만들기
     private static void CreateInstance()
     {
         GameObject go = new GameObject("LinkManager");
-        Instance = go.AddComponent<LinkManager>();
+        Instance = go.AddComponent<LocalManager>();
         DontDestroyOnLoad(go);
     }
 
