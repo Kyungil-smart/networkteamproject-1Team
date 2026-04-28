@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class MonsterAttackState : IState
 {
-    private MonsterContorller _monsterController;
+    private MonsterController _monsterController;
 
-    public MonsterAttackState(MonsterContorller monsterController)
+    public MonsterAttackState(MonsterController monsterController)
     {
         _monsterController = monsterController;
     }
@@ -16,6 +16,12 @@ public class MonsterAttackState : IState
 
     public void Update()
     {
+        if (_monsterController.MonsterAI.Target == null)
+        {
+            _monsterController.ChangeState(StateType.Patrol);
+            return;
+        }
+        
         if (_monsterController.DistanceToPlayer() > _monsterController.MonsterData.attackRange)
         {
             _monsterController.ChangeState(StateType.Chase);

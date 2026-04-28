@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class MonsterPatrolState : IState
 {
-    private MonsterContorller _monsterController;
+    private MonsterController _monsterController;
     private int _patrolIndex;
 
-    public MonsterPatrolState(MonsterContorller monsterController)
+    public MonsterPatrolState(MonsterController monsterController)
     {
         _monsterController = monsterController;
     }

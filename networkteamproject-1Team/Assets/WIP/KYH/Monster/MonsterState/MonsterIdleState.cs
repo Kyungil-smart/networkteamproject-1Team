@@ -4,25 +4,31 @@ using UnityEngine;
 
 public class MonsterIdleState : IState
 {
-    private MonsterContorller _monsterController;
+    private MonsterController _monsterController;
+    private float _timer;
 
-    public MonsterIdleState(MonsterContorller monsterController)
+    public MonsterIdleState(MonsterController monsterController)
     {
         _monsterController = monsterController;
     }
     
     public void Enter()
     {
-
+        _timer = 0f;
     }
 
     public void Update()
     {
-        _monsterController.ChangeState(StateType.Patrol);
+        _timer += Time.deltaTime;
+        
+        if (_timer > _monsterController.MonsterData.idleTime)
+        {
+            _monsterController.ChangeState(StateType.Patrol);
+        }
     }
 
     public void Exit()
     {
-
+        _timer = 0f;
     }
 }

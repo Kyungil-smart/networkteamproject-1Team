@@ -7,6 +7,7 @@ public class MonsterData
     public List<Transform> patrolPoints = new List<Transform>();
     public float speed;
     public Vector3 offset;
+    public float idleTime;
     public float chaseRange;
     public float attackRange;
 }
