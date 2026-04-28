@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Battle;
+using Cysharp.Threading.Tasks;
 
 // 플레이어 스폰과 팀 배정 담당
 // 팀 데이터는 각 TeamBase.Team (NetworkVariable) 에 보관
@@ -14,7 +16,7 @@ public class TeamManager : NetworkBehaviour
     [SerializeField, Min(1)] int _startTeamBCount = 1;
 
     // 서버 기준 스폰된 플레이어 목록 (서버 전용)
-    public List<TeamBase> ActivePlayers = new();
+    public List<TeamBase> activePlayers = new();
 
     protected override void OnNetworkPostSpawn()
     {
@@ -26,8 +28,12 @@ public class TeamManager : NetworkBehaviour
     {
         if (!IsServer) return;
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SpawnAllPlayers;
-        ActivePlayers.Clear();
+        activePlayers.Clear();
     }
+
+    // 팀별 플레이어 목록 조회
+    public List<TeamBase> GetPlayersByTeam(TeamType team)
+        => activePlayers.FindAll(r => r.Team.Value == team);
 
     void SpawnAllPlayers(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
@@ -53,7 +59,7 @@ public class TeamManager : NetworkBehaviour
 
             var role = instance.GetComponent<TeamBase>();
             role.Team.Value = team;
-            ActivePlayers.Add(role);
+            activePlayers.Add(role);
 
             // 오너 클라이언트에게 직접 올바른 위치로 텔레포트하라고 명령
             ClientRpcParams rpcParams = new ClientRpcParams
@@ -64,18 +70,15 @@ public class TeamManager : NetworkBehaviour
 
             Debug.Log($"[Spawn] Player {clientId} ({team})");
 
+            // 게임 시작
+            BattleManager.Instance.GameStart(activePlayers).Forget();
         }
     }
-
     public void SpawnAllPlayers() // 테스트용 간편 호출
     {
         SpawnAllPlayers(SceneManager.GetActiveScene().name, LoadSceneMode.Single,
             new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds), new List<ulong>());
     }
-
-    // 팀별 플레이어 목록 조회
-    public List<TeamBase> GetPlayersByTeam(TeamType team)
-        => ActivePlayers.FindAll(r => r.Team.Value == team);
 
     void Shuffle(List<ulong> list)
     {

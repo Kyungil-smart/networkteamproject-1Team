@@ -21,7 +21,7 @@ public partial class LocalManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] // 씬 시작 전에 만들기
     private static void CreateInstance()
     {
-        GameObject go = new GameObject("LinkManager");
+        GameObject go = new GameObject("LocalManager");
         Instance = go.AddComponent<LocalManager>();
         DontDestroyOnLoad(go);
     }
