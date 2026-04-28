@@ -46,7 +46,11 @@ namespace KYB
 
         private void OnMove(Vector2 moveInput)
         {
-            if (!IsOwner) return;
+            if (!IsOwner)
+            {
+                Debug.Log("[테스트]: IsOwner가 아닙니다.");
+                return;
+            }
             _input = moveInput;
         }
         
