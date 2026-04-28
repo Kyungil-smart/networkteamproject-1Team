@@ -21,7 +21,7 @@ public class MonsterIdleState : IState
     {
         _timer += Time.deltaTime;
         
-        if (_timer > 5f)
+        if (_timer > _monsterController.MonsterData.idleTime)
         {
             _monsterController.ChangeState(StateType.Patrol);
         }

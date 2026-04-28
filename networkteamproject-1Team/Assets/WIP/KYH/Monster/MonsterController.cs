@@ -69,7 +69,7 @@ public class MonsterController : NetworkBehaviour
         Collider[] colliders = Physics.OverlapSphere(transform.position + MonsterData.offset, MonsterData.chaseRange, _layerMask);
 
         Transform target = null;
-        float minDistance = float.MaxValue;
+        float minDistance = MonsterData.chaseRange;
         
         foreach (Collider col in colliders)
         {
