@@ -98,7 +98,6 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
 
         input.onMove -= OnMove;
         input.onJump -= OnJump;
-        input.Disable();
 
         this.UnregisterNetworkUpdate(NetworkUpdateStage.Update);
     }
@@ -112,13 +111,6 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
             MovePlayer();
             ApplyGravity();
             RotateCamera();
-
-            if (Keyboard.current.escapeKey.wasPressedThisFrame) // ESC 키로 게임 종료 (임시)
-            {
-                NetworkManager.Singleton.Shutdown();
-                LocalManager.Instance.isInGame = false;
-                UnityEngine.SceneManagement.SceneManager.LoadScene(0);
-            }
         }
     }
 

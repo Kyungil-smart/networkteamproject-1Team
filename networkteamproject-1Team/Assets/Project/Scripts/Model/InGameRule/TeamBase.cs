@@ -10,9 +10,7 @@ public abstract class TeamBase : NetworkBehaviour
     const int LAYER_B = 11;
 
     // 스폰 직후 팀 결정
-    public NetworkVariable<TeamType> Team = new NetworkVariable<TeamType>(TeamType.None,
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server);
+    public NetworkVariable<TeamType> Team = new NetworkVariable<TeamType>(TeamType.None);
 
     public override void OnNetworkSpawn()
     {
@@ -25,6 +23,7 @@ public abstract class TeamBase : NetworkBehaviour
     }
 
     void OnTeamChanged(TeamType prev, TeamType next) => HandleTeamAssigned(next);
+    protected abstract void OnTeamSetup(TeamType team);
 
     void HandleTeamAssigned(TeamType team)
     {
@@ -55,5 +54,16 @@ public abstract class TeamBase : NetworkBehaviour
         Debug.Log($"[{GetType().Name}] 팀 {team} 시야 적용");
     }
 
-    protected abstract void OnTeamSetup(TeamType team);
+    [ClientRpc]
+    public void ForceTeleportClientRpc(Vector3 position, Quaternion rotation, ClientRpcParams rpcParams = default)
+    {
+        if (TryGetComponent(out CharacterController cc))
+            cc.enabled = false;
+
+        transform.position = position;
+        transform.rotation = rotation;
+
+        if (TryGetComponent(out CharacterController cc2))
+            cc2.enabled = true;
+    }
 }
