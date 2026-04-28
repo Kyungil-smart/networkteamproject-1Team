@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Unity.Netcode;
 
-namespace WIP.KYB.Scripts
+namespace KYB
 {
     public class NetworkBootstrap : MonoBehaviour
     {

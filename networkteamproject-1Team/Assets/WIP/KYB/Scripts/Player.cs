@@ -3,7 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace WIP.KYB.Scripts
+namespace KYB
 {
     public class Player : NetworkBehaviour
     {
@@ -14,7 +14,8 @@ namespace WIP.KYB.Scripts
         [Header("레이 사거리")] public float interactionDistance = 3.0f;
 
         private IInteractable _interactableTarget;
-
+        
+        /*
         public override void OnNetworkSpawn()
         {
             if (!IsOwner)
@@ -38,11 +39,10 @@ namespace WIP.KYB.Scripts
             interAction.canceled -= OnInteractive;
             interAction.started -= OnInteractive;
         }
+        */
         
-        /// <summary>
-        /// F키 (상호작용)
-        /// </summary>
-        /// <param name="ctx"></param>
+        
+        /*
         private void OnInteractive(InputAction.CallbackContext ctx)
         {
             if (!IsOwner) return;
@@ -64,12 +64,13 @@ namespace WIP.KYB.Scripts
                 }
             }
         }
+        */
 
         /// <summary>
         /// 상호작용이 가능한 오브젝트를 return 해주는 메서드
         /// </summary>
         /// <returns>상호작용이 가능한 오브젝트</returns>
-        private IInteractable InteractiveObject()
+        public IInteractable InteractiveObject()
         {
             if (cam == null)
             {
