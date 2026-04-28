@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using TMPro;
+using System.IO;
 
 namespace Lobby
 {
@@ -9,7 +10,6 @@ namespace Lobby
     {
         [SerializeField] TMP_Text _loadingText;
         const int MIN_PLAYERS_TO_START = 2;
-        static readonly string[] SceneNames = { "Map1" };
 
         public BattleInputReader input;
 #if UNITY_EDITOR
@@ -50,16 +50,18 @@ namespace Lobby
                 input.on1 -= OnScene1;
                 //input.on2 -= OnScene2;
                 //input.on3 -= OnScene3;
+                input.Disable();
             }
         }
 
-        void OnScene1() => TryLoadScene(0);
-        //void OnScene2() => TryLoadScene(1);
-        //void OnScene3() => TryLoadScene(2);
+        // 빌드 인덱스 번호를 직접 넘깁니다 (예: Map1이 빌드 인덱스 1인 경우)
+        void OnScene1() => TryLoadScene(1);
+        //void OnScene2() => TryLoadScene(2);
+        //void OnScene3() => TryLoadScene(3);
 
         private void OnClientConnected(ulong clientId)
         {
-            if (LinkManager.Instance.isInGame) return;
+            if (LocalManager.Instance.isInGame) return;
 
             int count = NetworkManager.Singleton.ConnectedClientsIds.Count;
             Debug.Log($"[Session] 현재 접속자: {count}/{MIN_PLAYERS_TO_START}");
@@ -68,7 +70,7 @@ namespace Lobby
         private void TryLoadScene(int index)
         {
             if (!IsServer) return;
-            if (LinkManager.Instance.isInGame) return;
+            if (LocalManager.Instance.isInGame) return;
 
             int count = NetworkManager.Singleton.ConnectedClientsIds.Count;
             if (count < MIN_PLAYERS_TO_START)
@@ -78,15 +80,22 @@ namespace Lobby
             }
 
             ShowLoadingClientRpc();
-            string sceneName = SceneNames[index];
+
+            // 1. 빌드 인덱스로 씬의 전체 경로를 가져옵니다 (예: "Assets/Scenes/Map1.unity")
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(index);
+
+            // 2. 경로에서 확장자를 제외한 씬 이름만 추출합니다 (예: "Map1")
+            string sceneName = Path.GetFileNameWithoutExtension(scenePath);
+
+            // 3. NGO의 SceneManager를 통해 씬을 로드합니다
             NetworkManager.Singleton.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
 
         [ClientRpc]
         void ShowLoadingClientRpc()
         {
-            LinkManager.Instance.isInGame = true;
-            _loadingText.gameObject.SetActive(true); // 테스트용 로딩 보이기
+            LocalManager.Instance.isInGame = true;
+            _loadingText.gameObject.SetActive(true);
         }
     }
 }

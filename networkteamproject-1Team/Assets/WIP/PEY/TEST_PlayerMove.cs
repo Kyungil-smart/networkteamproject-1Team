@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using Unity.Cinemachine;
 using UnityEngine.Rendering;
+using Unity.Netcode.Components;
 
 public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
 {
@@ -26,7 +27,8 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     float _lastJumpTime;
 
     // 컴포넌트
-    Animator _animator;
+    Animator _ac;
+    NetworkAnimator _networkAc;
     CharacterController _controller;
 
     // 내부 상태
@@ -63,10 +65,20 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
         }
     }
 #endif
+    private void Awake()
+    {
+        _controller = GetComponent<CharacterController>();
+    }
 
     public override void OnNetworkSpawn()
     {
         if (!IsOwner) return;
+        _ac = GetComponent<Animator>();
+        _animIDSpeed = Animator.StringToHash("Speed");
+        _animIDGrounded = Animator.StringToHash("Grounded");
+        _animIDJump = Animator.StringToHash("Jump");
+        _animIDFreeFall = Animator.StringToHash("FreeFall");
+        _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
 
         input.Enable();
         input.onMove += OnMove;
@@ -86,7 +98,6 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
 
         input.onMove -= OnMove;
         input.onJump -= OnJump;
-        input.Disable();
 
         this.UnregisterNetworkUpdate(NetworkUpdateStage.Update);
     }
@@ -100,30 +111,12 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
             MovePlayer();
             ApplyGravity();
             RotateCamera();
-
-            if (Keyboard.current.escapeKey.wasPressedThisFrame) // ESC 키로 게임 종료 (임시)
-            {
-                NetworkManager.Singleton.Shutdown();
-                LinkManager.Instance.isInGame = false;
-                UnityEngine.SceneManagement.SceneManager.LoadScene(0);
-            }
         }
     }
 
-    private void Awake()
-    {
-        _controller = GetComponent<CharacterController>();
-        _animator = GetComponent<Animator>();
-
-        _animIDSpeed = Animator.StringToHash("Speed");
-        _animIDGrounded = Animator.StringToHash("Grounded");
-        _animIDJump = Animator.StringToHash("Jump");
-        _animIDFreeFall = Animator.StringToHash("FreeFall");
-        _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
-    }
 
     // ────────────────────────────────────────────
-    private void SetupCinemachineCamera()
+    void SetupCinemachineCamera()
     {
         GameObject camObj = GameObject.FindWithTag("GameController");
         camObj.TryGetComponent(out CinemachineCamera vcam);
@@ -144,7 +137,7 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
         {
             _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             _lastJumpTime = Time.time;
-            _animator.SetBool(_animIDJump, true);
+            _ac.SetBool(_animIDJump, true);
         }
     }
 
@@ -163,29 +156,29 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
         _controller.Move(inputDir * (targetSpeed * Time.deltaTime)
                          + Vector3.up * (_verticalVelocity * Time.deltaTime));
 
-        _animator.SetFloat(_animIDSpeed, targetSpeed);
+        _ac.SetFloat(_animIDSpeed, targetSpeed);
         
         // 애니 블렌드 트리 속도 제어
         float MotionSpeed = _moveInput == Vector2.zero ? 0f : 1f;
-        _animator.SetFloat(_animIDMotionSpeed, MotionSpeed);
+        _ac.SetFloat(_animIDMotionSpeed, MotionSpeed);
     }
 
     private void ApplyGravity()
     {
         if (_controller.isGrounded && _verticalVelocity <= 0.0f)
         {
-            _animator.SetBool(_animIDGrounded, true);
-            _animator.SetBool(_animIDFreeFall, false);
-            _animator.SetBool(_animIDJump, false);
+            _ac.SetBool(_animIDGrounded, true);
+            _ac.SetBool(_animIDFreeFall, false);
+            _ac.SetBool(_animIDJump, false);
 
             if (_verticalVelocity < 0f)
                 _verticalVelocity = -2f;
         }
         else
         {
-            _animator.SetBool(_animIDGrounded, false);
+            _ac.SetBool(_animIDGrounded, false);
             if (_verticalVelocity < 0f)
-                _animator.SetBool(_animIDFreeFall, true);
+                _ac.SetBool(_animIDFreeFall, true);
 
             _verticalVelocity += _gravity * Time.deltaTime;
         }
