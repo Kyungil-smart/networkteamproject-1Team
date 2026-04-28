@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 namespace WIP.KYB.Scripts
 {
-    public class NetworkBootstrap : NetworkBehaviour
+    public class NetworkBootstrap : MonoBehaviour
     {
         [SerializeField] private Button _startHostButton;
         [SerializeField] private Button _startClientButton;

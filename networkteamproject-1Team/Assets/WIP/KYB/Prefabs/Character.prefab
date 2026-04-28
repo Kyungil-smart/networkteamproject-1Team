@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ce7fff53113ffe944adfdba5d96bc4bd, type: 2}
+  - {fileID: 2100000, guid: 7c8ddd3ad0bd707418fdbb217820ef9f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -156,7 +156,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 26f227c62fc2fd640a5dd256d42b3811, type: 2}
+  - {fileID: 2100000, guid: 1ed6a5612c408834db62a8c85659b4db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -190,7 +190,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5033141915540201232}
   - component: {fileID: 1231548948970603522}
-  - component: {fileID: 8489244401017767160}
   - component: {fileID: 3289401950636513799}
   m_Layer: 0
   m_Name: MainCamera
@@ -265,14 +264,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &8489244401017767160
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7437610851957240645}
-  m_Enabled: 1
 --- !u!114 &3289401950636513799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -456,7 +447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3289968178
+  GlobalObjectIdHash: 1756810439
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -483,5 +474,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Player
   ShowTopMostFoldoutHeaderGroup: 1
   cam: {fileID: 1231548948970603522}
-  moveSpeed: 10.59
+  moveSpeed: 34.71
   interactionDistance: 49.52

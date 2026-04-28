@@ -8,17 +8,20 @@ public class Generator : NetworkBehaviour, IInteractable
     private PressAction _pressAction;
     private MeshRenderer _renderer;
     public Material completedMaterials;
-
-
-    private void Start()
+    
+    public override void OnNetworkSpawn()
     {
         _renderer = GetComponent<MeshRenderer>();
         _pressAction = GetComponent<PressAction>();
-        
-        _pressAction.OnPressCompleted += ChangeToCompleted;
-    }
 
-    private void ChangeToCompleted()
+        if (IsServer)
+        {
+            _pressAction.OnPressCompleted += ChangeToCompletedMaterialClientRpc; 
+        }
+    }
+    
+    [ClientRpc]
+    private void ChangeToCompletedMaterialClientRpc()
     {
         _renderer.material = completedMaterials;
         

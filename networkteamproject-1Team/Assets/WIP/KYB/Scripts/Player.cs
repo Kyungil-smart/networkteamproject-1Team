@@ -8,12 +8,9 @@ namespace WIP.KYB.Scripts
     public class Player : NetworkBehaviour
     {
         private PlayerInput _playerInput;
-        private Rigidbody _rb;
         private Vector2 _input;
         public Camera cam;
-
-        [SerializeField] private float moveSpeed;
-
+        
         [Header("레이 사거리")] public float interactionDistance = 3.0f;
 
         private IInteractable _interactableTarget;
@@ -22,45 +19,30 @@ namespace WIP.KYB.Scripts
         {
             if (!IsOwner)
             {
-                Camera playerCamera = GetComponentInChildren<Camera>();
-                if (playerCamera != null)
-                {
-                    playerCamera.gameObject.SetActive(false);
-                }
+                GetComponentInChildren<Camera>().gameObject.SetActive(false);
             }
-
+            
+            cam = GetComponentInChildren<Camera>();
             _playerInput = GetComponent<PlayerInput>();
-            _rb = GetComponent<Rigidbody>();
-
-            var moveAction = _playerInput.actions["Move"];
-            moveAction.performed += OnMove;
-            moveAction.canceled += OnMove;
-
-
+            
             var interAction = _playerInput.actions["Interaction"];
             interAction.performed += OnInteractive;
             interAction.canceled += OnInteractive;
             interAction.started += OnInteractive;
         }
 
-        private void FixedUpdate()
+        public override void OnNetworkDespawn()
         {
-            _rb.linearVelocity =
-                new Vector3( /*x,y,z*/ _input.x * moveSpeed, _rb.linearVelocity.y, _input.y * moveSpeed);
+            var interAction = _playerInput.actions["Interaction"];
+            interAction.performed -= OnInteractive;
+            interAction.canceled -= OnInteractive;
+            interAction.started -= OnInteractive;
         }
-
-        public void OnMove(InputAction.CallbackContext ctx)
-        {
-            if (!IsOwner) return;
-
-            _input = ctx.ReadValue<Vector2>();
-        }
-
+        
         private void OnInteractive(InputAction.CallbackContext ctx)
         {
             if (!IsOwner) return;
-
-            // TODO: 상호작용 코드 작성
+            
             if (ctx.started)
             {
                 _interactableTarget = InteractiveObject();
@@ -70,7 +52,6 @@ namespace WIP.KYB.Scripts
                     _interactableTarget.InteractStart();
                 }
             }
-            // else if (ctx.performed) Debug.Log("상호작용 버튼 preformed");
             else if (ctx.canceled)
             {
                 if (_interactableTarget != null)
@@ -82,6 +63,11 @@ namespace WIP.KYB.Scripts
 
         private IInteractable InteractiveObject()
         {
+            if (cam == null)
+            {
+                Debug.Log("[cam] cam이 null입니다.");
+            }
+            
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
 
@@ -101,6 +87,8 @@ namespace WIP.KYB.Scripts
 
         private void OnDrawGizmos()
         {
+            if (cam == null) return;
+            
             Gizmos.color = Color.red;
 
             Transform camTransform = cam.transform;

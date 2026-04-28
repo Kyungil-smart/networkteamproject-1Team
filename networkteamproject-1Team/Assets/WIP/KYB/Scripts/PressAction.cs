@@ -14,7 +14,6 @@ public class PressAction : NetworkBehaviour
     
     private Coroutine _coroutine;
     
-    // 흠 그니까 클리어된 객체는 모두가 읽고, 쓰기를 할 수 있게 해야제 ㅇㅇ 
     private NetworkVariable<bool> _isPressClear = new NetworkVariable<bool>(
         false,
         NetworkVariableReadPermission.Everyone,
@@ -43,51 +42,6 @@ public class PressAction : NetworkBehaviour
     {
         _currentTime.OnValueChanged -= OnUpdateFillAmountUI;
     }
-    
-    /*
-    /// <summary>
-    /// 스크립트가 활성화될 때 이벤트를 구독한다.
-    /// </summary>
-    private void OnEnable()
-    {
-        interactAction.action.started += OnPressStarted;
-        interactAction.action.canceled += OnPressCanceled;
-    }
-    
-    /// <summary>
-    /// 스크립트가 비활성화될 때 이벤트를 구독 해제한다 (안하면 메모리 누수)
-    /// </summary>
-    private void OnDisable()
-    {
-        interactAction.action.started -= OnPressStarted;
-        interactAction.action.canceled -= OnPressCanceled;
-    }
-    */
-    
-    /*
-    /// <summary>
-    /// 키가 눌렸을 때 실행될 콜백 함수들
-    /// </summary>
-    private void OnPressStarted(InputAction.CallbackContext ctx)
-    {
-        if (ctx.canceled) return;  
-        
-        Debug.Log("F키 눌림! 코루틴 시작!");
-        _coroutine = StartCoroutine(StartPressCoroutine());
-    }
-    
-    private void _OnPressCanceled(InputAction.CallbackContext ctx)
-    {
-        if (ctx.started || ctx.performed) return;
-        
-        Debug.Log("F키가 취소됨! 코루틴 취소!");
-        if (_coroutine != null)
-        {
-            StopCoroutine(_coroutine);
-            image.fillAmount = 0f;
-        }
-    }
-    */
     
     public void StartInteraction()
     {
@@ -134,8 +88,12 @@ public class PressAction : NetworkBehaviour
             
             yield return null;
         }
+
+        if (!_isPressClear.Value)
+        {
+            OnPressCompleted?.Invoke();
+        }
         
-        OnPressCompleted?.Invoke();
         _isPressClear.Value = true;
     }
     
@@ -151,8 +109,6 @@ public class PressAction : NetworkBehaviour
             
             yield return null;
         }
-        
-        // OnPressCanceled?.Invoke();
     }
     
     
