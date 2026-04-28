@@ -16,6 +16,12 @@ public class MonsterAttackState : IState
 
     public void Update()
     {
+        if (_monsterController.MonsterAI.Target == null)
+        {
+            _monsterController.ChangeState(StateType.Patrol);
+            return;
+        }
+        
         if (_monsterController.DistanceToPlayer() > _monsterController.MonsterData.attackRange)
         {
             _monsterController.ChangeState(StateType.Chase);
