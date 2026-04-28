@@ -32,6 +32,7 @@ namespace KYB
             _playerInput = GetComponent<PlayerInput>();
             _rb = GetComponent<Rigidbody>();
 
+            input.Enable();
             input.onStartInteract += OnStartInteractive;
             input.onCanceledInteract += OnCanceledInteractive;
             input.onMove += OnMove;
@@ -46,7 +47,11 @@ namespace KYB
 
         private void OnMove(Vector2 moveInput)
         {
-            if (!IsOwner) return;
+            if (!IsOwner)
+            {
+                Debug.Log("[테스트]: IsOwner가 아닙니다.");
+                return;
+            }
             _input = moveInput;
         }
         
