@@ -18,15 +18,15 @@ namespace Battle
                 if (!EqualityComparer<bool>.Default.Equals(_isDead, value))
                 {
                     _isDead = value;
-                    if (_isDead) onDeath?.Invoke();
+                    if (_isDead) onDeath?.Invoke(); // IsDead가 ture면 자동으로 onDeath 실행
                 }
             }
         }
-        public event Action onDeath;
+        public event Action onDeath; // 자식에서 구독
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer) CurHp.Value = maxHp;
+            if (IsServer) CurHp.Value = maxHp; // NetworkVariable은 서버만 초기화 해도 클라이언트에 동기화
             CurHp.OnValueChanged += OnHpChanged;
         }
 
