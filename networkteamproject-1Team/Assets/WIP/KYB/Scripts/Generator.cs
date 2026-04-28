@@ -20,6 +20,9 @@ public class Generator : NetworkBehaviour, IInteractable
         }
     }
     
+    /// <summary>
+    /// 머터리얼 변경 Rpc 메서드
+    /// </summary>
     [ClientRpc]
     private void ChangeToCompletedMaterialClientRpc()
     {

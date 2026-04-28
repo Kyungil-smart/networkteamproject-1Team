@@ -47,8 +47,17 @@ public class PressAction : NetworkBehaviour
     {
         StartPressServerRpc();
     }
+        
+    public void StopInteraction()
+    {
+        StopPressServerRpc();
+    }
 
+    /// <summary>
+    /// 상호작용 키 start되면 현재 돌고 있는 코루틴 종료
+    /// </summary>
     [ServerRpc(RequireOwnership = false)]
+    // [Rpc(SendTo.Server, RequireOwnership = false)]
     private void StartPressServerRpc()
     {
         if (_isPressClear.Value)
@@ -57,27 +66,28 @@ public class PressAction : NetworkBehaviour
             return;
         }
         
-        // 서버가 직접 코루틴을 돌리게
         if (_coroutine != null) StopCoroutine(_coroutine);
         _coroutine = StartCoroutine(StartPressCoroutine());
     }
-    
-    public void StopInteraction()
-    {
-        StopPressServerRpc();
-    }
 
+    /// <summary>
+    /// 상호작용 키 cancel되면 현재 돌고 있는 코루틴 종료
+    /// </summary>
     [ServerRpc(RequireOwnership = false)]
+    // [Rpc(SendTo.Server, RequireOwnership = false)]
     private void StopPressServerRpc()
     {
         if (_isPressClear.Value) return;
         
         // 코루틴 강제 종료
         if (_coroutine != null) StopCoroutine(_coroutine);
-        
         _coroutine = StartCoroutine(DecreasePressCoroutine());
     }
 
+    /// <summary>
+    /// 게이지 플러스(+) 되는 코루틴
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator StartPressCoroutine()
     {
         _holdTime = 10f;
@@ -97,6 +107,10 @@ public class PressAction : NetworkBehaviour
         _isPressClear.Value = true;
     }
     
+    /// <summary>
+    /// 게이지 마이너스(-) 되는 코루틴
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator DecreasePressCoroutine()
     {
         _holdTime = 10f;
@@ -111,7 +125,7 @@ public class PressAction : NetworkBehaviour
         }
     }
     
-    
+    // UI 업데이트 코루틴 (FillAmount)
     private void OnUpdateFillAmountUI(float previousValue, float newValue)
     {
         image.fillAmount = newValue / _holdTime;

@@ -39,6 +39,10 @@ namespace WIP.KYB.Scripts
             interAction.started -= OnInteractive;
         }
         
+        /// <summary>
+        /// F키 (상호작용)
+        /// </summary>
+        /// <param name="ctx"></param>
         private void OnInteractive(InputAction.CallbackContext ctx)
         {
             if (!IsOwner) return;
@@ -61,6 +65,10 @@ namespace WIP.KYB.Scripts
             }
         }
 
+        /// <summary>
+        /// 상호작용이 가능한 오브젝트를 return 해주는 메서드
+        /// </summary>
+        /// <returns>상호작용이 가능한 오브젝트</returns>
         private IInteractable InteractiveObject()
         {
             if (cam == null)
