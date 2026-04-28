@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/WIP/PEY/_LOBBY_TEST.unity
     guid: 628ad765dbbb8bf4b9dcb51f9710e0c3
   - enabled: 1
-    path: Assets/WIP/PEY/Map1.unity
-    guid: b7c70d2a7a78c064ba47b5ff795794f4
+    path: Assets/WIP/PEY/GameRule/Map1_GameTest.unity
+    guid: 28df31dab58931548bf2941b21b81076
   - enabled: 1
     path: Assets/WIP/KYB/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05

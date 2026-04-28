@@ -28,7 +28,7 @@ namespace Battle
             NotifyDeathClientRpc();
 
             // 게임 규칙 처리 위임
-            BattleManager.Instance.DestroyEntity(this);
+            BattleManager.Instance.DestroyPlayer(this);
         }
 
         [ClientRpc]

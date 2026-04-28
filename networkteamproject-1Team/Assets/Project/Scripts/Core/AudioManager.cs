@@ -29,7 +29,15 @@ public class AudioManager : MonoBehaviour
 #endif
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; } Instance = this; //싱글톤
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this; DontDestroyOnLoad(gameObject); //싱글톤
+
+        //sfxSources는 PlaySfx에서 풀링하며 사용하기 때문에 초기화
+        for (int i = 0; i < sfxSources.Length; i++)
+        {
+            sfxSources[i] = gameObject.AddComponent<AudioSource>();
+            sfxSources[i].outputAudioMixerGroup = audioMixer.FindMatchingGroups("SFX")[0];
+        }
     }
 
     public void PlayBGM(AudioResource bgmClip)

@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c814bbe9fac778e41a877d4c92083c19, type: 3}
   m_Name: BattleInputReader
   m_EditorClassIdentifier: Assembly-CSharp::BattleInputReader
+  isSprint: 0

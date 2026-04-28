@@ -1,8 +1,9 @@
-using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Audio;
+using Cysharp.Threading.Tasks;
 
 public interface IDamageable
 {
@@ -22,20 +23,35 @@ namespace Battle
         [HideInInspector] public TeamManager tm;
         private void Awake() => tm = GetComponent<TeamManager>();
 
-        [Header("오디오")]
-        AudioResource _countSound;
+        public event Action OnGameStart;
 
-        public async UniTaskVoid GameStart(List<TeamBase> players)
+        [Header("오디오")]
+        public AudioResource countSound;
+
+        public void StartGame() // 재시작 겸용
         {
-            AudioManager.Instance.PlaySfx(_countSound);
-            await UniTask.Delay(3000);
+            // 아직 살아있는 플레이어 제거
+            for (int i = tm.activePlayers.Count - 1; i >= 0; i--)
+                tm.activePlayers[i].NetworkObject.Despawn();
+
+            // 재스폰 + 팀 재배정 + GameStart
+            tm.SpawnAllPlayers();
+        }
+        public async UniTaskVoid StartCountdown(List<TeamBase> players) // 게임 시작전에는 움직이지 못하게 한다던가 고려중
+        {
+            AudioManager.Instance.PlaySfx(countSound);
+            await UniTask.Delay(1000); // 시작 딜레이 (임시로 짧게)
+            OnGameStart?.Invoke();
+            Debug.Log("게임을 시작하지");
         }
 
-        public void DestroyEntity(EntityBase entity)
+        public void DestroyPlayer(EntityBase entity)
         {
+            if (entity.TryGetComponent(out TeamBase tb)) tm.activePlayers.Remove(tb);
             entity.NetworkObject.Despawn();
             //TODO: 탈락, 승패 판정 등
         }
+
     }
 }
 

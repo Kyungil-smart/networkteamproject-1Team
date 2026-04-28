@@ -119,11 +119,16 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     void SetupCinemachineCamera()
     {
         GameObject camObj = GameObject.FindWithTag("GameController");
-        camObj.TryGetComponent(out CinemachineCamera vcam);
+        if (camObj == null) // 씬에 카메라가 디스폰으로 파괴되었다면 새로 생성
+        {
+            camObj = new GameObject("CinemachineCamera");
+            camObj.AddComponent<CinemachineCamera>();
+        }
+
         camObj.transform.SetParent(_cameraPos.transform, false);
         camObj.transform.localPosition = Vector3.zero;
         camObj.transform.localRotation = Quaternion.identity;
-        
+
         // 자기 머리 보이지 않도록 설정
         _headMesh.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         //Cursor.lockState = CursorLockMode.Locked;
@@ -157,7 +162,7 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
                          + Vector3.up * (_verticalVelocity * Time.deltaTime));
 
         _ac.SetFloat(_animIDSpeed, targetSpeed);
-        
+
         // 애니 블렌드 트리 속도 제어
         float MotionSpeed = _moveInput == Vector2.zero ? 0f : 1f;
         _ac.SetFloat(_animIDMotionSpeed, MotionSpeed);
@@ -187,7 +192,7 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     private void RotateCamera()
     {
         Vector2 mouseDelta = Mouse.current.delta.ReadValue();
-        
+
         _yaw += mouseDelta.x * _mouseSensitivity;
         //_yaw = Mathf.Clamp(_yaw, _initialYaw + _leftClamp, _initialYaw + _rightClamp);
 

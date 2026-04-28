@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1093822834009677046}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.099999994, y: 0.13899994, z: -3.3479998}
+  m_LocalPosition: {x: -3.64, y: 0.13899994, z: -2.48}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -56,7 +56,7 @@ Transform:
   m_GameObject: {fileID: 2419215533358128432}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.79999995, y: 0.13899994, z: -4.3479996}
+  m_LocalPosition: {x: 0.41, y: 0.13899994, z: -2.12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -87,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 2465891181657602377}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.01, y: 0.139, z: -5.218}
+  m_LocalPosition: {x: 0.76, y: 0.139, z: -4.14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -118,7 +118,7 @@ Transform:
   m_GameObject: {fileID: 2858678903513283173}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.76, y: 0.13899994, z: -4.158}
+  m_LocalPosition: {x: -3.99, y: 0.13899994, z: -4.158}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -149,7 +149,7 @@ Transform:
   m_GameObject: {fileID: 6100117846570119536}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.82, y: 0.13899994, z: -5.378}
+  m_LocalPosition: {x: -1.82, y: 0.13899994, z: -5.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -207,7 +207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 254917868
+  GlobalObjectIdHash: 3755675965
   InScenePlacedSourceGlobalObjectIdHash: 1902990976
   DeferredDespawnTick: 0
   Ownership: 1
@@ -243,7 +243,7 @@ MonoBehaviour:
   - {fileID: 2895751722952907238}
   - {fileID: 938788222672293061}
   _startTeamBCount: 1
-  ActivePlayers: []
+  activePlayers: []
 --- !u!114 &1658008972141709227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,6 +257,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Battle.BattleManager
   ShowTopMostFoldoutHeaderGroup: 1
+  tm: {fileID: 0}
+  countSound: {fileID: 8300000, guid: ff5a3bcd482e49e40b3c5f915872a180, type: 3}
 --- !u!1 &8886919161004434004
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,7 +284,7 @@ Transform:
   m_GameObject: {fileID: 8886919161004434004}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.62, y: 0.13899994, z: -3.1779997}
+  m_LocalPosition: {x: -1.69, y: 0.13899994, z: -2.63}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
