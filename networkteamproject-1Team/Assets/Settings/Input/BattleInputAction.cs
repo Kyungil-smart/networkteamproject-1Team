@@ -116,7 +116,7 @@ public partial class @BattleInputAction: IInputActionCollection2, IDisposable
                     ""id"": ""99c55524-59f4-433e-aabf-1fbaa816be54"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": ""Hold"",
+                    ""interactions"": ""Press"",
                     ""initialStateCheck"": false
                 },
                 {
