@@ -30,7 +30,26 @@ public class UIManager : MonoBehaviour
     [Header("대기 화면")]
     [SerializeField] private GameObject waitingPanel;            // "플레이어 대기중..."
 
+    // [이벤트 구독]
+    private void start()
+    {
+        // GameManager 이벤트 에 내 함수들을 구독
+        GameManager.Instance.OnGameStarted += HandleGameStarted;
+        GameManager.Instance.OnGameOver += HandleGameOver;
+        
+        // 초기 상태: 대기 화면만 표시
+        ShowWaitingScreen();
+    }
     
-    
-    
+    // [오브젝트가 파괴될 때 구독 해제]
+    private void OnDestroy()
+    {
+        if  (Instance == this) Instance = null;
+        GameManager.Instance.OnGameStarted -= 
+        
+    }
+
+
+
+
 }
