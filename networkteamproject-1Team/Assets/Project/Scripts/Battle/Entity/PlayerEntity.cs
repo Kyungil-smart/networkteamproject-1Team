@@ -20,7 +20,6 @@ namespace Battle
             onDeath -= AlertDeath;
         }
 
-        // onDeath는 서버의 OnHpChanged에서만 발행됨
         void AlertDeath()
         {
             if (!IsServer) return;
