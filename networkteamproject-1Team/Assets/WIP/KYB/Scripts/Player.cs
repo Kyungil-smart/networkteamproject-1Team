@@ -32,6 +32,7 @@ namespace KYB
             _playerInput = GetComponent<PlayerInput>();
             _rb = GetComponent<Rigidbody>();
 
+            input.Enable();
             input.onStartInteract += OnStartInteractive;
             input.onCanceledInteract += OnCanceledInteractive;
             input.onMove += OnMove;
