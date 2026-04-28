@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public interface IDamageable
 {
@@ -21,10 +22,13 @@ namespace Battle
         [HideInInspector] public TeamManager tm;
         private void Awake() => tm = GetComponent<TeamManager>();
 
+        [Header("오디오")]
+        AudioResource _countSound;
 
         public async UniTaskVoid GameStart(List<TeamBase> players)
         {
-
+            AudioManager.Instance.PlaySfx(_countSound);
+            await UniTask.Delay(3000);
         }
 
         public void DestroyEntity(EntityBase entity)
