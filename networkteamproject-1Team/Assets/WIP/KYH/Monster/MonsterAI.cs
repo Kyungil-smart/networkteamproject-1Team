@@ -2,9 +2,12 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
+/// <summary>
+/// 몬스터 AI Navmesh 행동을 수행
+/// </summary>
 public class MonsterAI : NetworkBehaviour
 {
-    private MonsterContorller _monsterController;
+    private MonsterController _monsterController;
     public Transform Target { get; set; }
     public NavMeshAgent Agent { get; set; }
     public bool IsDetected { private get; set; }
@@ -22,7 +25,7 @@ public class MonsterAI : NetworkBehaviour
     
     private void Init()
     {
-        _monsterController = GetComponent<MonsterContorller>();
+        _monsterController = GetComponent<MonsterController>();
         Agent = GetComponent<NavMeshAgent>();
     }
 

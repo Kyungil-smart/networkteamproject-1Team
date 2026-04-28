@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class MonsterAttackState : IState
 {
-    private MonsterContorller _monsterController;
+    private MonsterController _monsterController;
 
-    public MonsterAttackState(MonsterContorller monsterController)
+    public MonsterAttackState(MonsterController monsterController)
     {
         _monsterController = monsterController;
     }

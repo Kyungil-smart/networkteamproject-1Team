@@ -13,7 +13,7 @@ public enum StateType
 /// <summary>
 /// 몬스터의 전반적인 기능을 관리
 /// </summary>
-public class MonsterContorller : NetworkBehaviour
+public class MonsterController : NetworkBehaviour
 {
     [field:SerializeField] public MonsterData MonsterData { get; set; }
     private StateMachine _state;
