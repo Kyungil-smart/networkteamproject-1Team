@@ -13,11 +13,13 @@ public enum StateType
 /// <summary>
 /// 몬스터의 전반적인 기능을 관리
 /// </summary>
-public class MonsterContorller : NetworkBehaviour
+public class MonsterController : NetworkBehaviour
 {
     [field:SerializeField] public MonsterData MonsterData { get; set; }
     private StateMachine _state;
     private LayerMask _layerMask;
+    private Animator _anim;
+    private PathSettingManager _path;
     
     public NetworkVariable<StateType> currentState = new NetworkVariable<StateType>(
         writePerm: NetworkVariableWritePermission.Server);
@@ -40,6 +42,11 @@ public class MonsterContorller : NetworkBehaviour
             MonsterAI.enabled = false;
         }
     }
+
+    private void OnEnable()
+    {
+        currentState.OnValueChanged += OnStateChanged;
+    }
     
     private void Update()
     {
@@ -48,11 +55,19 @@ public class MonsterContorller : NetworkBehaviour
         _state.Update();
     }
     
+    private void OnDisable()
+    {
+        currentState.OnValueChanged -= OnStateChanged;
+    }
+    
     private void Init()
     {
         _state = new StateMachine();
         MonsterAI = GetComponent<MonsterAI>();
+        _anim = GetComponentInChildren<Animator>();
         _layerMask = LayerMask.GetMask("Player");
+        _path = FindAnyObjectByType<PathSettingManager>();
+        PathSet();
         
         IdleState = new MonsterIdleState(this);
         PatrolState = new MonsterPatrolState(this);
@@ -69,7 +84,7 @@ public class MonsterContorller : NetworkBehaviour
         Collider[] colliders = Physics.OverlapSphere(transform.position + MonsterData.offset, MonsterData.chaseRange, _layerMask);
 
         Transform target = null;
-        float minDistance = float.MaxValue;
+        float minDistance = MonsterData.chaseRange;
         
         foreach (Collider col in colliders)
         {
@@ -88,9 +103,6 @@ public class MonsterContorller : NetworkBehaviour
     {
         switch (newState)
         {
-            case StateType.Idle:
-                _state.ChangeState(IdleState);
-                break;
             case StateType.Patrol:
                 _state.ChangeState(PatrolState);
                 break;
@@ -105,16 +117,43 @@ public class MonsterContorller : NetworkBehaviour
         currentState.Value = newState;
     }
 
+    private void OnStateChanged(StateType oldState, StateType newState)
+    {
+        switch (newState)
+        {
+            case StateType.Patrol:
+                _anim.SetBool("Attack", false);
+                _anim.SetFloat("MoveSpeed", 1f);
+                break;
+            case StateType.Chase:
+                _anim.SetBool("Attack", false);
+                _anim.SetFloat("MoveSpeed", 1f);
+                break;
+            case StateType.Attack:
+                _anim.SetFloat("MoveSpeed", 0f);
+                _anim.SetBool("Attack", true);
+                int rand = UnityEngine.Random.Range(0, 2);
+                _anim.SetInteger("AttackRand", rand);
+                break;
+        }
+    }
+
     public float DistanceToPlayer()
     {
         return Vector3.Distance(transform.position, MonsterAI.Target.position);
     }
 
+    private void PathSet()
+    {
+        if (_path.pathSettings.Count == 0) return;
+        MonsterData.patrolPoints = _path.pathSettings;
+    }
+
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
+        Gizmos.color = new Color(1, 1, 0, 0.3f);
         Gizmos.DrawSphere(transform.position + MonsterData.offset, MonsterData.chaseRange);
-        Gizmos.color = Color.blue;
+        Gizmos.color = new Color(0, 0, 1, 0.3f);
         Gizmos.DrawSphere(transform.position + MonsterData.offset, MonsterData.attackRange);
     }
 }
