@@ -3493,10 +3493,10 @@ GameObject:
   - component: {fileID: 5183037754872636016}
   - component: {fileID: 5736656004420520446}
   - component: {fileID: 5158639744957943204}
-  - component: {fileID: 1786060495148949840}
   - component: {fileID: 5657637999782056080}
+  - component: {fileID: 2171950331504567429}
   m_Layer: 6
-  m_Name: Player_Test
+  m_Name: Player_Proto
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3579,7 +3579,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 868897466
+  GlobalObjectIdHash: 605714047
   InScenePlacedSourceGlobalObjectIdHash: 4046959855
   DeferredDespawnTick: 0
   Ownership: 1
@@ -3678,30 +3678,6 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &1786060495148949840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6184062823718913633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32b1ef932bb7a6d4799948d7ee58785f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TEST_PlayerMove
-  ShowTopMostFoldoutHeaderGroup: 1
-  _moveSpeed: 4
-  _sprintMultiplier: 2
-  _jumpHeight: 1
-  _rotationSmoothTime: 0.12
-  _cameraPos: {fileID: 3848584360461170148}
-  _headMesh: {fileID: 5160295197210405799}
-  _upClamp: -40
-  _downClamp: 70
-  _mouseSensitivity: 0.09
-  jumpCooldown: 1.5
-  input: {fileID: 11400000, guid: f3dea7d9139022049872a40ab03fa674, type: 2}
 --- !u!114 &5657637999782056080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3722,6 +3698,19 @@ MonoBehaviour:
     m_InternalValue: 0
   _normalModel: {fileID: 6790813245457356444}
   _monsterModel: {fileID: 6742135036820130305}
+--- !u!114 &2171950331504567429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6184062823718913633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb115fadb04c34740b6a3e53cccb8bd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &6240414296530918941
 GameObject:
   m_ObjectHideFlags: 0
