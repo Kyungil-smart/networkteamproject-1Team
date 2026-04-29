@@ -3,79 +3,100 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace WIP.KYB.Scripts
+namespace KYB
 {
+    // 플레이어 (임시, 테스트용)
     public class Player : NetworkBehaviour
     {
+        public BattleInputReader input;
+
         private PlayerInput _playerInput;
+        private Rigidbody _rb;
         private Vector2 _input;
         public Camera cam;
+
+        [SerializeField] private float moveSpeed;
         
         [Header("레이 사거리")] public float interactionDistance = 3.0f;
 
         private IInteractable _interactableTarget;
-
+        
         public override void OnNetworkSpawn()
         {
             if (!IsOwner)
             {
                 GetComponentInChildren<Camera>().gameObject.SetActive(false);
             }
-            
+
             cam = GetComponentInChildren<Camera>();
             _playerInput = GetComponent<PlayerInput>();
-            
-            var interAction = _playerInput.actions["Interaction"];
-            interAction.performed += OnInteractive;
-            interAction.canceled += OnInteractive;
-            interAction.started += OnInteractive;
+            _rb = GetComponent<Rigidbody>();
+
+            input.Enable();
+            input.onStartInteract += OnStartInteractive;
+            input.onCanceledInteract += OnCanceledInteractive;
+            input.onMove += OnMove;
         }
 
         public override void OnNetworkDespawn()
         {
-            var interAction = _playerInput.actions["Interaction"];
-            interAction.performed -= OnInteractive;
-            interAction.canceled -= OnInteractive;
-            interAction.started -= OnInteractive;
+            input.onMove -= OnMove;
+            input.onStartInteract -= OnStartInteractive;
+            input.onCanceledInteract -= OnCanceledInteractive;
+        }
+
+        private void OnMove(Vector2 moveInput)
+        {
+            if (!IsOwner)
+            {
+                Debug.Log("[테스트]: IsOwner가 아닙니다.");
+                return;
+            }
+            _input = moveInput;
         }
         
-        /// <summary>
-        /// F키 (상호작용)
-        /// </summary>
-        /// <param name="ctx"></param>
-        private void OnInteractive(InputAction.CallbackContext ctx)
+        private void FixedUpdate()
+        {
+            _rb.linearVelocity = new Vector3(_input.x * moveSpeed, _rb.linearVelocity.y, _input.y * moveSpeed);
+        }
+        
+
+        private void OnStartInteractive()
         {
             if (!IsOwner) return;
-            
-            if (ctx.started)
-            {
-                _interactableTarget = InteractiveObject();
 
-                if (_interactableTarget != null)
-                {
-                    _interactableTarget.InteractStart();
-                }
-            }
-            else if (ctx.canceled)
+            _interactableTarget = InteractiveObject();
+
+            if (_interactableTarget != null)
             {
-                if (_interactableTarget != null)
-                {
-                    _interactableTarget.InteractStop();
-                }
+                _interactableTarget.InteractStart();
             }
         }
+
+        private void OnCanceledInteractive()
+        {
+            if (!IsOwner) return;
+
+            _interactableTarget = InteractiveObject();
+
+            if (_interactableTarget != null)
+            {
+                _interactableTarget.InteractStop();
+            }
+        }
+
 
         /// <summary>
         /// 상호작용이 가능한 오브젝트를 return 해주는 메서드
         /// </summary>
         /// <returns>상호작용이 가능한 오브젝트</returns>
-        private IInteractable InteractiveObject()
+        public IInteractable InteractiveObject()
         {
             if (cam == null)
             {
                 Debug.Log("[cam] cam이 null입니다.");
             }
-            
+
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             RaycastHit hit;
 
@@ -96,7 +117,7 @@ namespace WIP.KYB.Scripts
         private void OnDrawGizmos()
         {
             if (cam == null) return;
-            
+
             Gizmos.color = Color.red;
 
             Transform camTransform = cam.transform;

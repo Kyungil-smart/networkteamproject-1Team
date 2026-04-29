@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: cfea64bf7171f7b4590c6bac645c4d68, type: 3}
+  m_Actions: {fileID: -944628639613478452, guid: a986ca7082d39504f89279fc1d242f7d, type: 3}
   m_NotificationBehavior: 2
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
@@ -424,15 +424,39 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls: []
-    m_ActionId: ffbdb4bf-8451-4f10-b73d-43302a95fee5
-    m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
+    m_ActionId: 18db37ae-ed83-4554-a44f-b45d8de9ea29
+    m_ActionName: 'Battle/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   - m_PersistentCalls:
       m_Calls: []
-    m_ActionId: be86ef0b-00e0-4e35-8be5-bd7e14c6364d
-    m_ActionName: 'Player/Interaction[/Keyboard/f]'
+    m_ActionId: 689a7754-e3cc-48d4-9712-16e8b7290db1
+    m_ActionName: 'Battle/Sprint[/Keyboard/leftShift]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 99c55524-59f4-433e-aabf-1fbaa816be54
+    m_ActionName: 'Battle/Interact[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 98b49e37-519e-4966-875f-9a106fccd08e
+    m_ActionName: 'Battle/Attack[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 5ae69f95-a45f-49a2-99ff-29c57c24f9b6
+    m_ActionName: 'Battle/Jump[/Keyboard/space]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: d25c9ae4-e558-45e5-a2b8-82b4577eaed5
+    m_ActionName: 'Battle/1[/Keyboard/1,/Keyboard/numpad1]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c0fcc440-95d7-4177-8c79-f6e8b8e269ad
+    m_ActionName: 'Battle/2[/Keyboard/2,/Keyboard/numpad2]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: cfe5222d-ccf2-4747-9c12-8a974e0f0dd0
+    m_ActionName: 'Battle/3[/Keyboard/3,/Keyboard/numpad3]'
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
+  m_DefaultControlScheme: KeyBoard, Mouse
+  m_DefaultActionMap: Battle
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!114 &7146950320088201495
@@ -447,7 +471,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1756810439
+  GlobalObjectIdHash: 3289968178
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -473,6 +497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   ShowTopMostFoldoutHeaderGroup: 1
+  input: {fileID: 11400000, guid: f3dea7d9139022049872a40ab03fa674, type: 2}
   cam: {fileID: 1231548948970603522}
-  moveSpeed: 34.71
+  moveSpeed: 14.19
   interactionDistance: 49.52

@@ -12,7 +12,7 @@ public class BattleInputReader : ScriptableObject, IBattleActions
     public bool isSprint;
 
     public event Action onAttack;
-    public event Action onInteract; public event Action Interact; public event Action offInteract;
+    public event Action onStartInteract; public event Action onPerformedInteract; public event Action onCanceledInteract;
     public event Action onJump;
 
     public event Action on1; public event Action on2; public event Action on3;
@@ -47,9 +47,9 @@ public class BattleInputReader : ScriptableObject, IBattleActions
     }
     public void OnInteract(InputAction.CallbackContext context)
     {
-        if (context.started) onInteract?.Invoke();
-        if (context.performed) Interact?.Invoke();
-        if (context.canceled) offInteract?.Invoke();
+        if (context.started) onStartInteract?.Invoke();
+        if (context.performed) onPerformedInteract?.Invoke(); 
+        if (context.canceled) onCanceledInteract?.Invoke();  
     }
 
     public void OnJump(InputAction.CallbackContext context)
