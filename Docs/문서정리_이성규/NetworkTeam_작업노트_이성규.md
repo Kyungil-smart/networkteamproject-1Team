@@ -170,13 +170,13 @@ draw.io를 통해 사전 구조 설계.
 - 프리팹 충돌 방지를 위해 개인별 네트워크 프리팹 리스트를 활용한 독립 작업 및 추후 병합으로 합의.
 - 본격적인 플레이어 개발을 위한 폴더 생성 및 임시 개인 작업용 네트워크 프리팹 리스트 생성
 
-## 플레이어 컨트롤러 제작 시작
+### 플레이어 컨트롤러 제작 시작
 
 어제 작업한 구조 설계를 기반으로 스크립트 생성
 
 ---
 
-### **PlayerController 구현**
+#### **PlayerController 구현**
 
 - **역할:** 플레이어 오브젝트의 최상단 에이전트(`NetworkBehaviour`)로서, 필수 컴포넌트 캐싱 및 하위 모듈 간의 **의존성 주입(DI)을 전담**하는 컨트롤 타워.
 - **구현 흐름:**
@@ -188,7 +188,7 @@ draw.io를 통해 사전 구조 설계.
 
 ---
 
-### **PlayerInputHandler 구현**
+#### **PlayerInputHandler 구현**
 
 - **역할:** `BattleInputReader` (SO)로부터 입력 이벤트를 수신하여 이동, 카메라, 전투, 상호작용 등 개별 행동 모듈로 신호를 전달하는 **라우팅 및 관리 계층**.
 - **구현 흐름:**
@@ -200,7 +200,7 @@ draw.io를 통해 사전 구조 설계.
 
 ---
 
-### **PlayerMovement 구현**
+#### **PlayerMovement 구현**
 
 - **역할:** `CharacterController`를 기반으로 캐릭터의 물리적 이동, 점프, 중력 및 회전 로직을 직접 수행하는 **실제 행동 모듈**.
 - **구현 흐름:**
@@ -213,9 +213,40 @@ draw.io를 통해 사전 구조 설계.
 #### **가속도 및 점프 속도($\sqrt{h \cdot -2g}$) 공식 설명**
 - 목표 높이($h$)에 도달하기 위해 필요한 수직 시작 속도($v$)를 계산.
 
+## Day6 — 2026-04-29
+
+### BattleInputReader 수정
+
+팀원이 만든 인풋 액션 SO를 합의하에 수정.
+
+- `event Action<bool> onSprintChanged` 추가
+- `OnSprint` 콜백 내에서 이전 상태(`isSprint`)와 현재 입력값을 비교하여 **변화가 있을 때만** 값 갱신 + 이벤트 발행
+- 기존 `isSprint` 변수는 호환성 유지를 위해 그대로 두되 프로퍼티로 외부 수정 방지.
+
+```csharp
+public void OnSprint(InputAction.CallbackContext context)
+{
+    bool newSprint = context.ReadValueAsButton();
+    if (newSprint != isSprint)
+    {
+        isSprint = newSprint;
+        onSprintChanged?.Invoke(isSprint);
+    }
+}
+```
+
+> 외부에서 sprint 입력 변화 시점에만 이벤트로 수신 가능 → 매 프레임 호출 불필요.
+
+### PlayerInputHandler 이벤트 기반 전환
+
+기존 Update에서 매 프레임 `_input.isSprint` 폴링하던 방식을 제거하고 `onSprintChanged` 이벤트 구독으로 변경.
+
+- **Update 메서드 제거** — 모든 입력 처리가 이벤트 기반으로 통일
+- Jump 액션 이벤트 할당 누락 발견 → 추가
+
 ---
 
-### **PlayerAnimation 구현**
+### **PlayerCamera 구현**
 
 - **역할**:
 - **구현 흐름**:
@@ -223,7 +254,7 @@ draw.io를 통해 사전 구조 설계.
 
 ---
 
-### **PlayerCamera 구현**
+### **PlayerAnimation 구현**
 
 - **역할**:
 - **구현 흐름**:
