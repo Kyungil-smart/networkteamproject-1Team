@@ -29,23 +29,18 @@ public class MonsterController : NetworkBehaviour
     public MonsterPatrolState PatrolState { get; private set; }
     public MonsterChaseState ChaseState { get; private set; }
     public MonsterAttackState AttackState { get; private set; }
-
-
+    
     public override void OnNetworkSpawn()
     {
-        if (IsServer)
-        {
-            Init();
-        }
-        else
+        Init();
+        
+        if (!IsServer)
         {
             MonsterAI.enabled = false;
         }
-    }
-
-    private void OnEnable()
-    {
+        
         currentState.OnValueChanged += OnStateChanged;
+        OnStateChanged(currentState.Value, currentState.Value);
     }
     
     private void Update()
@@ -75,8 +70,11 @@ public class MonsterController : NetworkBehaviour
         AttackState = new MonsterAttackState(this);
         
         if (MonsterData.speed != 0f) MonsterAI.Agent.speed = MonsterData.speed;
-        _state.ChangeState(IdleState);
-        currentState.Value = StateType.Idle;
+        if (IsServer)
+        {
+            _state.ChangeState(IdleState);
+            currentState.Value = StateType.Idle;
+        }
     }
 
     public Transform DetectPlayer()
@@ -101,6 +99,8 @@ public class MonsterController : NetworkBehaviour
 
     public void ChangeState(StateType newState)
     {
+        if (currentState.Value == newState) return;
+        
         switch (newState)
         {
             case StateType.Patrol:
