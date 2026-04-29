@@ -19,7 +19,9 @@ namespace Player
         
         private CharacterController _controller;
         // 카메라 연결
+        // private PlayerCamera _camera;
         // 전투 연결
+        // private PlayerCombat _combat;
         
         // 이동 연산에 사용되는 변수
         private Vector2 _moveInput;
