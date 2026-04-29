@@ -38,11 +38,9 @@ public class MonsterController : NetworkBehaviour
         {
             MonsterAI.enabled = false;
         }
-    }
-
-    private void OnEnable()
-    {
+        
         currentState.OnValueChanged += OnStateChanged;
+        OnStateChanged(currentState.Value, currentState.Value);
     }
     
     private void Update()
@@ -101,6 +99,8 @@ public class MonsterController : NetworkBehaviour
 
     public void ChangeState(StateType newState)
     {
+        if (currentState.Value == newState) return;
+        
         switch (newState)
         {
             case StateType.Patrol:
