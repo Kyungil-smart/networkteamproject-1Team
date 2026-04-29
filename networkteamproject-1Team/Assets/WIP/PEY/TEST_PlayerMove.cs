@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
-using Unity.Cinemachine;
 using UnityEngine.Rendering;
 using Unity.Netcode.Components;
 
@@ -95,6 +94,7 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     public override void OnNetworkDespawn()
     {
         if (!IsOwner) return;
+        _camObj.transform.SetParent(null); // 플레이어가 파괴될 때 시네머신/카메라가 같이 파괴되지 않도록 최상단으로 분리
 
         input.onMove -= OnMove;
         input.onJump -= OnJump;
@@ -116,23 +116,21 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
 
 
     // ────────────────────────────────────────────
+    GameObject _camObj;
     void SetupCinemachineCamera()
     {
-        GameObject camObj = GameObject.FindWithTag("GameController");
-        if (camObj == null) // 씬에 카메라가 디스폰으로 파괴되었다면 새로 생성
-        {
-            camObj = new GameObject("CinemachineCamera");
-            camObj.AddComponent<CinemachineCamera>();
-        }
+        _camObj = GameObject.FindWithTag("GameController");
 
-        camObj.transform.SetParent(_cameraPos.transform, false);
-        camObj.transform.localPosition = Vector3.zero;
-        camObj.transform.localRotation = Quaternion.identity;
+        _camObj.transform.SetParent(_cameraPos.transform, false);
+        _camObj.transform.localPosition = Vector3.zero;
+        _camObj.transform.localRotation = Quaternion.identity;
 
         // 자기 머리 보이지 않도록 설정
         _headMesh.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         //Cursor.lockState = CursorLockMode.Locked;
     }
+
+
 
     private void OnMove(Vector2 value) => _moveInput = value;
 

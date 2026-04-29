@@ -1733,7 +1733,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   audioMixer: {fileID: 24100000, guid: fcd354daf01904f4ebd08479ee6f1ae1, type: 2}
   bgmSource: {fileID: 663814701}
-  drySfxSource: {fileID: 663814703}
   wetSfxSources:
   - {fileID: 0}
   - {fileID: 0}
@@ -1743,6 +1742,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  drySfxSource: {fileID: 663814703}
 --- !u!4 &663814700
 Transform:
   m_ObjectHideFlags: 0
@@ -1752,7 +1752,7 @@ Transform:
   m_GameObject: {fileID: 663814698}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.95071, y: 5.41775, z: 18.71096}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3276,10 +3276,10 @@ PrefabInstance:
     - target: {fileID: 3441935513908701369, guid: e06407df0a470054eaeb599475a054c9, type: 3}
       propertyPath: _playerPrefabB
       value: 
-      objectReference: {fileID: 6184062823718913633, guid: 8de53801d133d4e4096e6efa3b8081ae, type: 3}
+      objectReference: {fileID: 297689902301139574, guid: 5aac3a8dabc9ab64ba4f0bd5fd7aa278, type: 3}
     - target: {fileID: 3441935513908701369, guid: e06407df0a470054eaeb599475a054c9, type: 3}
       propertyPath: _startTeamBCount
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6097040077253655725, guid: e06407df0a470054eaeb599475a054c9, type: 3}
       propertyPath: GlobalObjectIdHash

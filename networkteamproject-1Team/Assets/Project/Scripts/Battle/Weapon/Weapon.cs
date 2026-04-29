@@ -63,37 +63,41 @@ namespace Battle
             // 아무것도 못 맞춤: Miss
             if (!Physics.Raycast(_attackPoint.position, transform.forward, out RaycastHit hit, weaponSO.range))
             {
-                AudioManager.Instance.PlaySfxWet(weaponSO.attackMiss);
+                AudioManager.Instance.PlaySfxWet(weaponSO.attackMiss, _attackPoint.position);
                 return;
             }
 
-            // 맞았지만 NetworkObject가 없음: Blocked
+            // 맞았지만 NetworkObject가 없음: Blocked (히트 위치로 전파)
             NetworkObject targetNetObj = hit.collider.GetComponent<NetworkObject>();
             if (targetNetObj == null)
             {
-                AudioManager.Instance.PlaySfxWet(weaponSO.attackBlocked);
+                BlockedServerRpc(hit.point);
                 return;
             }
 
-            // 네트워크 오브젝트에 명중
-            AttackServerRpc(targetNetObj.NetworkObjectId, weaponSO.damage);
+            // 네트워크 오브젝트에 명중 (히트 위치로 전파)
+            AttackServerRpc(targetNetObj.NetworkObjectId, weaponSO.damage, hit.point);
         }
 
         [ServerRpc]
-        void AttackServerRpc(ulong targetId, int damage)
+        void BlockedServerRpc(Vector3 hitPoint) => BlockedClientRpc(hitPoint);
+        [ClientRpc]
+        void BlockedClientRpc(Vector3 hitPoint) => AudioManager.Instance.PlaySfxWet(weaponSO.attackBlocked, hitPoint);
+
+        [ServerRpc]
+        void AttackServerRpc(ulong targetId, int damage, Vector3 hitPoint)
         {
             NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var targetNetObj);
             if (targetNetObj.TryGetComponent(out IDamageable damageable))
                 damageable.TakeDamage(damage);
 
-            AttackClientRpc(OwnerClientId, damage, targetNetObj.OwnerClientId);
+            AttackClientRpc(OwnerClientId, damage, targetNetObj.OwnerClientId, hitPoint);
         }
-
         [ClientRpc]
-        void AttackClientRpc(ulong attackerId, int damage, ulong targetId)
+        void AttackClientRpc(ulong attackerId, int damage, ulong targetId, Vector3 hitPoint)
         {
-            // 플레이어 명중: 공격자/피격자/주변 모든 클라이언트에서 Hit 사운드 재생
-            AudioManager.Instance.PlaySfxWet(weaponSO.attackHit);
+            // 타격 위치 기준 3D 공간음 재생
+            AudioManager.Instance.PlaySfxWet(weaponSO.attackHit, hitPoint);
             Debug.Log($"[Weapon] 공격자={attackerId}, 피해자={targetId}, damage={damage}");
         }
     }

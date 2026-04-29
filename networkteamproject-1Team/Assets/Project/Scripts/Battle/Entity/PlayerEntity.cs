@@ -1,13 +1,10 @@
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Audio;
 
 namespace Battle
 {
     public class PlayerEntity : EntityBase
     {
-        public AudioResource hitClip; //피격
-
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
