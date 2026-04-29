@@ -9,6 +9,11 @@ public class AudioManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void Init() => Instance = null;
 
+    [Header("3D 사운드")]
+    [SerializeField] float _spatialBlend = 0.9f; // 3D 사운드 정도
+    [SerializeField] float _minDistance = 0.5f;
+    [SerializeField] float _maxDistance = 49f;
+
     public AudioMixer audioMixer;
     bool[] isMute = new bool[3];
     float[] audioVolumes = new float[3];
@@ -31,7 +36,8 @@ public class AudioManager : MonoBehaviour
 #endif
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; } Instance = this; DontDestroyOnLoad(gameObject); //싱글톤
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this; DontDestroyOnLoad(gameObject); //싱글톤
 
         // wetSfxSources: 각 AudioSource를 독립 자식 GameObject에 붙여서 위치를 개별 제어 가능하게 함
         // 오브젝트 풀링 안의 스피커를 hitPoint로 순간이동시켜 재사용
@@ -43,8 +49,9 @@ public class AudioManager : MonoBehaviour
 
             AudioSource source = speaker.AddComponent<AudioSource>();
             source.outputAudioMixerGroup = sfxMixerGroup;
-            source.spatialBlend  = 1f;
-            source.maxDistance   = 5f;
+            source.spatialBlend = _spatialBlend;
+            source.minDistance = _minDistance;
+            source.maxDistance = _maxDistance;
 
             wetSfxSources[i] = source;
         }

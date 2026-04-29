@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3754407487
+  GlobalObjectIdHash: 1655495061
   InScenePlacedSourceGlobalObjectIdHash: 4046959855
   DeferredDespawnTick: 0
   Ownership: 1
@@ -248,6 +248,7 @@ MonoBehaviour:
   _downClamp: 70
   _mouseSensitivity: 0.09
   jumpCooldown: 1.5
+  _footStep: {fileID: 6418180475301049370, guid: 5db78ea202abebb449023b5247c15a27, type: 2}
   input: {fileID: 11400000, guid: f3dea7d9139022049872a40ab03fa674, type: 2}
 --- !u!114 &7827823926399345752
 MonoBehaviour:
@@ -286,7 +287,6 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  hitClip: {fileID: 0}
 --- !u!114 &5298724664702677977
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 using UnityEngine.Rendering;
 using Unity.Netcode.Components;
+using UnityEngine.Audio;
 
 public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
 {
@@ -25,9 +26,11 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     public float jumpCooldown = 1.5f;
     float _lastJumpTime;
 
+    [Header("Audio")]
+    [SerializeField] AudioResource _footStep;
+
     // 컴포넌트
     Animator _ac;
-    NetworkAnimator _networkAc;
     CharacterController _controller;
 
     // 내부 상태
@@ -203,6 +206,7 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     // 애니메이션 이벤트 리시버 (추후 사운드 재생 시)
     private void OnFootstep(AnimationEvent animationEvent)
     {
+        AudioManager.Instance.PlaySfxWet(_footStep, this.transform.position);
     }
 
     private void OnLand(AnimationEvent animationEvent)
