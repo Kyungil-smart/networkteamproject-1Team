@@ -14,7 +14,8 @@ public class AudioManager : MonoBehaviour
     float[] audioVolumes = new float[3];
 
     public AudioSource bgmSource;
-    public AudioSource[] sfxSources = new AudioSource[8]; int sfxIndex;
+    public AudioSource scapeSource; //환경음
+    public AudioSource[] sfxSources = new AudioSource[8]; int sfxIndex; // 배열 갯수만큼 소리 제한
 
 #if UNITY_EDITOR
     private void Reset()
@@ -29,10 +30,9 @@ public class AudioManager : MonoBehaviour
 #endif
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this; DontDestroyOnLoad(gameObject); //싱글톤
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; } Instance = this; DontDestroyOnLoad(gameObject); //싱글톤
 
-        //sfxSources는 PlaySfx에서 풀링하며 사용하기 때문에 초기화
+        //sfxSources는 PlaySfx에서 풀링하며 사용
         for (int i = 0; i < sfxSources.Length; i++)
         {
             sfxSources[i] = gameObject.AddComponent<AudioSource>();
