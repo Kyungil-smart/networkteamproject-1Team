@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace Battle
 {
@@ -7,15 +8,10 @@ namespace Battle
     {
         public enum State
         {
-            None, Ready,
-            //Empty, Reloading,
+            None, Ready,//Empty, Reloading,
         }
         State _state;
         public WeaponSO weaponSO;
-
-        //public int ammoRemain;
-        //public int ammoInMag;
-        //연출필드(TODO)
 
         [SerializeField] Transform _attackPoint;
         float _lastAttackTime;
@@ -64,19 +60,29 @@ namespace Battle
         }
         void Attack()
         {
-            if (!Physics.Raycast(_attackPoint.position, transform.forward, out RaycastHit hit, weaponSO.range)) return;
-            Debug.Log($"부딪힘: {hit.collider}");
+            // 아무것도 못 맞춤: Miss
+            if (!Physics.Raycast(_attackPoint.position, transform.forward, out RaycastHit hit, weaponSO.range))
+            {
+                AudioManager.Instance.PlaySfx(weaponSO.attackMiss);
+                return;
+            }
 
+            // 맞았지만 NetworkObject가 없음: Blocked
             NetworkObject targetNetObj = hit.collider.GetComponent<NetworkObject>();
-            if (targetNetObj == null) return;
+            if (targetNetObj == null)
+            {
+                AudioManager.Instance.PlaySfx(weaponSO.attackBlocked);
+                return;
+            }
 
+            // 네트워크 오브젝트에 명중
             AttackServerRpc(targetNetObj.NetworkObjectId, weaponSO.damage);
         }
 
         [ServerRpc]
         void AttackServerRpc(ulong targetId, int damage)
         {
-            if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var targetNetObj)) return;
+            NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var targetNetObj);
             if (targetNetObj.TryGetComponent(out IDamageable damageable))
                 damageable.TakeDamage(damage);
 
@@ -86,8 +92,9 @@ namespace Battle
         [ClientRpc]
         void AttackClientRpc(ulong attackerId, int damage, ulong targetId)
         {
+            // 플레이어 명중: 공격자/피격자/주변 모든 클라이언트에서 Hit 사운드 재생
+            AudioManager.Instance.PlaySfx(weaponSO.attackHit);
             Debug.Log($"[Weapon] 공격자={attackerId}, 피해자={targetId}, damage={damage}");
-            // TODO: 공격 사운드 재생, 타격 이펙트 등
         }
     }
 }

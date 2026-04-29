@@ -68,7 +68,7 @@ public class TeamManager : NetworkBehaviour
             };
             role.ForceTeleportClientRpc(sp.position, sp.rotation, rpcParams);
 
-            Debug.Log($"[Spawn] Player {clientId} ({team})");
+            Debug.Log($"[TeamManager] Player {clientId} ({team})");
         }
             // 게임 시작
             GameStartRpc();

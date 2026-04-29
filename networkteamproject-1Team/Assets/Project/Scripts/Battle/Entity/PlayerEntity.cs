@@ -24,7 +24,6 @@ namespace Battle
         {
             if (!IsServer) return;
 
-            // 오너 클라이언트에게 사망 연출 RPC 전송
             NotifyDeathClientRpc();
 
             // 게임 규칙 처리 위임
@@ -34,7 +33,7 @@ namespace Battle
         [ClientRpc]
         void NotifyDeathClientRpc()
         {
-            if (IsOwner) YouDied();
+            if (IsOwner) YouDied(); // 오너만 사망 연출
         }
         void YouDied()
         {
