@@ -39,7 +39,7 @@ public class MonsterPatrolState : IState
         if (_monsterController.MonsterData.patrolPoints == null) return;
         
         _monsterController.MonsterAI.Agent.SetDestination(
-            _monsterController.MonsterData.patrolPoints[_patrolIndex].transform.position);
+            _monsterController.MonsterData.patrolPoints[_patrolIndex]);
         _patrolIndex = (_patrolIndex + 1) % _monsterController.MonsterData.patrolPoints.Count;
     }
 }

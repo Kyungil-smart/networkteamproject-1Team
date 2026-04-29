@@ -4,7 +4,7 @@ using UnityEngine;
 [System.Serializable]
 public class MonsterData
 {
-    public List<Transform> patrolPoints = new List<Transform>();
+    public List<Vector3> patrolPoints = new List<Vector3>();
     public float speed;
     public Vector3 offset;
     public float idleTime;

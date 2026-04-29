@@ -2,24 +2,27 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-public class FakeShadowFader : MonoBehaviour
+namespace Player
 {
-    [SerializeField] DecalProjector _decal;
-    [SerializeField] float _maxHeight = 1f;
-    [SerializeField] LayerMask _groundLayer;
-    
-    // 바닥과 거리에 따라 데칼을 페이드해서 자연스러운 Fake Shadow 연출
-    void LateUpdate()
+    public class FakeShadowFader : MonoBehaviour
     {
-        if (Physics.Raycast(transform.position, Vector3.down,
-                out RaycastHit hit, _maxHeight, _groundLayer))
+        [SerializeField] DecalProjector _decal;
+        [SerializeField] float _maxHeight = 1f;
+        [SerializeField] LayerMask _groundLayer;
+
+        // 바닥과 거리에 따라 데칼을 페이드해서 자연스러운 Fake Shadow 연출
+        void LateUpdate()
         {
-            float distance = hit.distance;
-            _decal.fadeFactor = 1f - (distance / _maxHeight);
-        }
-        else
-        {
-            _decal.fadeFactor = 0f;
+            if (Physics.Raycast(transform.position, Vector3.down,
+                    out RaycastHit hit, _maxHeight, _groundLayer))
+            {
+                float distance = hit.distance;
+                _decal.fadeFactor = 1f - (distance / _maxHeight);
+            }
+            else
+            {
+                _decal.fadeFactor = 0f;
+            }
         }
     }
 }

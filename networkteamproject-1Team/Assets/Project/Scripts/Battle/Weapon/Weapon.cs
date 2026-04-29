@@ -41,16 +41,19 @@ namespace Battle
         public override void OnNetworkSpawn()
         {
             if (!IsOwner) return;
-            _state = State.Ready;
+            
             input.Enable();
             input.onAttack += TryAttack;
+            BattleManager.Instance.OnGameStart += Ready;
         }
         public override void OnNetworkDespawn()
         {
             if (!IsOwner) return;
             input.onAttack -= TryAttack;
+            BattleManager.Instance.OnGameStart -= Ready;
         }
 
+        void Ready() => _state = State.Ready;
         public void TryAttack()
         {
             if (_state == State.Ready && Time.time >= _lastAttackTime + weaponSO.cooltime)

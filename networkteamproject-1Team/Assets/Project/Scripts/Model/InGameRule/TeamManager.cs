@@ -28,7 +28,6 @@ public class TeamManager : NetworkBehaviour
     {
         if (!IsServer) return;
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SpawnAllPlayers;
-        activePlayers.Clear();
     }
 
     // 팀별 플레이어 목록 조회
@@ -37,6 +36,7 @@ public class TeamManager : NetworkBehaviour
 
     void SpawnAllPlayers(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
+        activePlayers.Clear();
         // 셔플로 팀 배정 결정
         List<ulong> shuffled = new List<ulong>(clientsCompleted);
         Shuffle(shuffled);
@@ -69,15 +69,21 @@ public class TeamManager : NetworkBehaviour
             role.ForceTeleportClientRpc(sp.position, sp.rotation, rpcParams);
 
             Debug.Log($"[Spawn] Player {clientId} ({team})");
-
-            // 게임 시작
-            BattleManager.Instance.GameStart(activePlayers).Forget();
         }
+            // 게임 시작
+            GameStartRpc();
     }
     public void SpawnAllPlayers() // 테스트용 간편 호출
     {
         SpawnAllPlayers(SceneManager.GetActiveScene().name, LoadSceneMode.Single,
             new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds), new List<ulong>());
+    }
+
+    // 게임 시작을 클라이언트에게 전달
+    [Rpc(SendTo.Everyone)]
+    public void GameStartRpc()
+    {
+        BattleManager.Instance.StartCountdown(activePlayers).Forget();
     }
 
     void Shuffle(List<ulong> list)
