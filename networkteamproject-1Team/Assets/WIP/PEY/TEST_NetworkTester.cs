@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using Battle;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -26,11 +27,11 @@ public class TEST_NetworkTester : NetworkBehaviour
             NetworkManager.Singleton.StartClient();
             Debug.Log("[TEST] 클라이언트 시작");
         }
-        // F3: 모든 플레이어 스폰
+        // F3: 게임 시작 (재시작 겸용)
         if (Keyboard.current.f3Key.wasPressedThisFrame)
         {
             if (!IsServer) return;
-            PSM.SpawnAllPlayers();
+            BattleManager.Instance.StartGame();
         }
     }
 }

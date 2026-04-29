@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace Battle
 {
@@ -27,24 +28,25 @@ namespace Battle
         public override void OnNetworkSpawn()
         {
             if (IsServer) CurHp.Value = maxHp; // NetworkVariable은 서버만 초기화 해도 클라이언트에 동기화
-            CurHp.OnValueChanged += OnHpChanged;
+            //CurHp.OnValueChanged += OnHpChanged;
         }
 
-        public override void OnNetworkDespawn()
-        {
-            CurHp.OnValueChanged -= OnHpChanged;
-        }
+        //public override void OnNetworkDespawn()
+        //{
+        //    CurHp.OnValueChanged -= OnHpChanged;
+        //}
 
-        void OnHpChanged(int prev, int next)
-        {
-            if (next <= 0) IsDead = true;
-        }
+        //void OnHpChanged(int prev, int next)
+        //{
+        //    Debug.LogWarning("누군가 데미지 입음");
+        //}
 
         // 서버에서 호출
         public virtual void TakeDamage(int damage) // Vector3 hitPoint, Vector3 hitNormal (추가 가능 구현시)
         {
             if (IsDead) return;
             CurHp.Value -= damage;
+            if (CurHp.Value <= 0) IsDead = true;
         }
     }
 }
