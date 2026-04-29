@@ -13,9 +13,9 @@ namespace Player
         private PlayerMovement     _movement;
         private PlayerCamera       _camera;
         // private PlayerAnimation    _animation;
+        // private PlayerInteractor   _interactor;
         // private PlayerCombat       _combat;
         // private PlayerHealth       _health;
-        // private PlayerInteractor   _interactor;
         
         // 캐싱
         void Awake()
@@ -25,9 +25,9 @@ namespace Player
             _movement   = GetComponent<PlayerMovement>();
             _camera     = GetComponent<PlayerCamera>();
             // _animation  = GetComponent<PlayerAnimation>();
+            // _interactor = GetComponent<PlayerInteractor>();
             // _combat     = GetComponent<PlayerCombat>();
             // _health     = GetComponent<PlayerHealth>();
-            // _interactor = GetComponent<PlayerInteractor>();
         }
 
         public override void OnNetworkSpawn()
@@ -43,6 +43,7 @@ namespace Player
             // Owner만 모듈 간 의존성 주입 허용
             _input.Initialize(_movement);
             // 자기 시점 처리 (ViewPoint)
+            _camera.SetupOwnerView();
         }
     }
 }
