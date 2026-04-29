@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Player
@@ -21,9 +20,10 @@ namespace Player
         
         // 하위로 입력을 받는 모듈 선언
         private PlayerMovement _movement;
-        // 카메라
-        // 전투
         // 상호작용
+        // 전투
+        // 카메라 관련 입력 추가시 생성
+        // private PlayerCamera _camera;
         
         private bool _lastSprintState;
         
@@ -40,9 +40,9 @@ namespace Player
         void BindEvents()
         {
             _input.Enable();
-             _input.onMove += OnMove;
-             _input.onJump += OnJump; 
-             _input.onSprintChanged += OnSprintChanged;
+            _input.onMove += OnMove;
+            _input.onJump += OnJump; 
+            _input.onSprintChanged += OnSprintChanged;
         }
         
         // 이동 관련 이벤트 할당 해제(메모리 누수 방지)
@@ -60,7 +60,7 @@ namespace Player
         }
         
         // 이벤트 할당 함수(람다식 연결)
-        void OnMove(Vector2 v) => _movement?.SetMoveInput(v);
+        private void OnMove(Vector2 v) => _movement?.SetMoveInput(v);
         private void OnJump() => _movement?.RequestJump();
         private void OnSprintChanged(bool b) => _movement?.SetSprint(b);
         
