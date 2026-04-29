@@ -13,7 +13,7 @@ public class TeamManager : NetworkBehaviour
     [SerializeField] GameObject _playerPrefabA;  // TeamA 부착 프리팹
     [SerializeField] GameObject _playerPrefabB;  // TeamB 부착 프리팹
     [SerializeField] Transform[] _spawnPoints;
-    [SerializeField, Min(1)] int _startTeamBCount = 1;
+    [SerializeField, Min(0)] int _startTeamBCount = 1;
 
     // 서버 기준 스폰된 플레이어 목록 (서버 전용)
     public List<TeamBase> activePlayers = new();

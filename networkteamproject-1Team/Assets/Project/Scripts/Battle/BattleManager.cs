@@ -44,7 +44,7 @@ namespace Battle
         // 모든 클라이언트에서 실행
         public async UniTaskVoid StartCountdown(List<TeamBase> players)
         {
-            AudioManager.Instance.PlaySfx(countSound);
+            AudioManager.Instance.PlaySfxWet(countSound);
             await UniTask.Delay(1000); // 시작 딜레이 (임시로 짧게)
             OnGameStart?.Invoke();
             Debug.Log("게임을 시작하지");

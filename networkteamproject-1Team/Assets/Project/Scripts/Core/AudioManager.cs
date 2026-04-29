@@ -14,8 +14,9 @@ public class AudioManager : MonoBehaviour
     float[] audioVolumes = new float[3];
 
     public AudioSource bgmSource;
-    public AudioSource scapeSource; //환경음
-    public AudioSource[] sfxSources = new AudioSource[8]; int sfxIndex; // 배열 갯수만큼 소리 제한
+    //public AudioSource scapeSource; // 한종류가 항상 재생중이라 주석 처리중
+    public AudioSource drySfxSource; // 리버브 없는 효과음 (예: UI 사운드)
+    public AudioSource[] wetSfxSources = new AudioSource[8]; int sfxIndex; // 배열 갯수만큼 소리 제한
 
 #if UNITY_EDITOR
     private void Reset()
@@ -32,29 +33,30 @@ public class AudioManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; } Instance = this; DontDestroyOnLoad(gameObject); //싱글톤
 
-        //sfxSources는 PlaySfx에서 풀링하며 사용
-        for (int i = 0; i < sfxSources.Length; i++)
+        //wetSfxSources는 PlaySfx에서 풀링하며 사용
+        for (int i = 0; i < wetSfxSources.Length; i++)
         {
-            sfxSources[i] = gameObject.AddComponent<AudioSource>();
-            sfxSources[i].outputAudioMixerGroup = audioMixer.FindMatchingGroups("SFX")[0];
+            wetSfxSources[i] = gameObject.AddComponent<AudioSource>();
+            wetSfxSources[i].outputAudioMixerGroup = audioMixer.FindMatchingGroups("SFX Reverb")[0];
         }
     }
 
     public void PlayBGM(AudioResource bgmClip)
     {
-        if (bgmSource.clip == bgmClip) return;
-
         bgmSource.resource = bgmClip;
-        bgmSource.loop = true;
         bgmSource.Play();
     }
-    public void PlaySfx(AudioResource clip)
+    public void PlaySfxWet(AudioResource clip) // 리버브 있고 3D 공간음향 적용 예정인 효과음 
     {
-        sfxSources[sfxIndex].resource = clip;
-        sfxSources[sfxIndex].Play();
-        sfxIndex = (sfxIndex + 1) % sfxSources.Length;
+        wetSfxSources[sfxIndex].resource = clip;
+        wetSfxSources[sfxIndex].Play();
+        sfxIndex = (sfxIndex + 1) % wetSfxSources.Length;
     }
-
+    public void PlaySfxDry(AudioResource clip)
+    {
+        drySfxSource.resource = clip;
+        drySfxSource.Play();
+    }
 
     public void SetAudioVolume(AudioMixerType audioMixerType, float volume)
     {

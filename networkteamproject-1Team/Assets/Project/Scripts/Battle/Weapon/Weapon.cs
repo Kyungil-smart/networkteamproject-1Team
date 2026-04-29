@@ -63,7 +63,7 @@ namespace Battle
             // 아무것도 못 맞춤: Miss
             if (!Physics.Raycast(_attackPoint.position, transform.forward, out RaycastHit hit, weaponSO.range))
             {
-                AudioManager.Instance.PlaySfx(weaponSO.attackMiss);
+                AudioManager.Instance.PlaySfxWet(weaponSO.attackMiss);
                 return;
             }
 
@@ -71,7 +71,7 @@ namespace Battle
             NetworkObject targetNetObj = hit.collider.GetComponent<NetworkObject>();
             if (targetNetObj == null)
             {
-                AudioManager.Instance.PlaySfx(weaponSO.attackBlocked);
+                AudioManager.Instance.PlaySfxWet(weaponSO.attackBlocked);
                 return;
             }
 
@@ -93,7 +93,7 @@ namespace Battle
         void AttackClientRpc(ulong attackerId, int damage, ulong targetId)
         {
             // 플레이어 명중: 공격자/피격자/주변 모든 클라이언트에서 Hit 사운드 재생
-            AudioManager.Instance.PlaySfx(weaponSO.attackHit);
+            AudioManager.Instance.PlaySfxWet(weaponSO.attackHit);
             Debug.Log($"[Weapon] 공격자={attackerId}, 피해자={targetId}, damage={damage}");
         }
     }
