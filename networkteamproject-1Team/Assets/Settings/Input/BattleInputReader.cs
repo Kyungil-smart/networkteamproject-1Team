@@ -9,7 +9,8 @@ public class BattleInputReader : ScriptableObject, IBattleActions
     public BattleInputAction inputAction;
 
     public event Action<Vector2> onMove;
-    public bool isSprint;
+    public event Action<bool> onSprintChanged;
+    public bool isSprint { get; private set; }
 
     public event Action onAttack;
     public event Action onStartInteract; public event Action onPerformedInteract; public event Action onCanceledInteract;
@@ -38,7 +39,13 @@ public class BattleInputReader : ScriptableObject, IBattleActions
     }
     public void OnSprint(InputAction.CallbackContext context)
     {
-        isSprint = context.ReadValueAsButton();
+        // 이전 호출 시점과 현재 상태를 비교해서 값이 변했으면 isSprint
+        bool newSprint = context.ReadValueAsButton();
+        if (newSprint != isSprint)
+        {
+            isSprint = newSprint;
+            onSprintChanged?.Invoke(isSprint);
+        }
     }
 
     void IBattleActions.OnAttack(InputAction.CallbackContext context)
