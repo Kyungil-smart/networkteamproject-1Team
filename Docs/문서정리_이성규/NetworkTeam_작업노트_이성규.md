@@ -246,7 +246,11 @@ public void OnSprint(InputAction.CallbackContext context)
 
 ---
 
-구현 전 내용 정리 중 테스트 시 발생한 부자연 스러움. 천장같은 곳에 머리를 부딪혔을때 달라붙는 느낌. 천장에 닿았을때 상승하는 힘을 0혹은 그 이하값으로 만들어 바로 떨어지게 만들어준다.
+### **PlayerMovement 보강 — 천장 충돌 처리**
+
+테스트 중 점프 시 천장 부딪힘에서 잠깐 달라붙는 느낌 발견. `CharacterController.Move`의 반환 `CollisionFlags`로 `Above` 충돌을 감지하여, 상승 중일 때만 `_verticalVelocity`를 0으로 강제 변경. 즉시 낙하 전환되어 자연스러운 점프 종료.
+
+---
 
 ### **PlayerCamera 구현**
 
@@ -260,11 +264,26 @@ public void OnSprint(InputAction.CallbackContext context)
 
 - **활용**: 캐릭터 본체 회전이 카메라 yaw를 따라가도록 Movement에서 처리하므로, 캐릭터 회전과 카메라 회전이 자연스럽게 일치.
 
-> **추후 폴리싱**: 상하 회전 시 카메라만 회전시키는 현재 방식에 캐릭터 Spine 본을 적정 수치로 IK 보정 추가하면 더 자연스러운 연출 가능 (다른 클라이언트가 봤을 때 위/아래 시선이 표현됨).
+#### 설계 결정 사항
 
-- **역할**:
-- **구현 흐름**:
-- **활용**:
+**[시네머신 카메라 부착 방식: 씬 배치 + Target 갱신]**  
+플레이어 자식으로 카메라를 두는 방식 대신 **씬에 시네머신 카메라를 1개 배치하고 Target만 갈아끼우는 방식** 채택.  
+**이유**:
+- 다중 플레이어 환경에서 카메라 인스턴스가 플레이어 수만큼 생기는 문제 회피
+- 추후 관전 시점 / 결과 화면 / 컷씬 카메라 추가 시 Target 전환만으로 대응 가능
+- 카메라 흔들림(Impulse) 등 외부 카메라 효과 시스템과 통합 용이
+
+**[시네머신 Position/Rotation Control 선정]**  
+- Position Control: `Hard Lock To Target` — 1인칭 시점은 보간(Damping) 없이 즉시 추적해야 흐물거림 없음
+- Rotation Control: `Same As Follow Target` — Target(ViewPoint)의 회전을 그대로 사용. `Hard Look At`은 Target을 *바라보는* 회전이라 의도와 다름 (위치가 같으면 LookAt 방향 미정의로 오작동 가능)
+
+**[CharacterController Radius 증가]**  
+1인칭 시점에서 시야가 벽 안쪽으로 들어가 컬링되는 현상 방지를 위해 반경 증가. 카메라 NearClipPlane을 짧게(0.05) 두어도 캐릭터가 벽에 너무 가까이 붙으면 카메라 위치 자체가 콜라이더 밖으로 나가는 문제 발생 → 반경을 적정 수준으로 늘려 시점이 항상 콜라이더 내부에 위치하도록 보정.
+
+**[CharacterController 채택 (vs Rigidbody)]**  
+이전 OverTheSky 프로젝트에서 Rigidbody 기반 컨트롤러를 직접 구현했으나, 본 프로젝트는 호러 탐험 + 즉발 점프 위주라 물리 시뮬레이션 불필요. CharacterController의 빠른 반응성·간결한 API가 적합.
+
+> **추후 폴리싱**: 상하 회전 시 카메라만 회전시키는 현재 방식에 캐릭터 Spine 본을 적정 수치로 IK 보정 추가하면 더 자연스러운 연출 가능 (다른 클라이언트가 봤을 때 위/아래 시선이 표현됨).
 
 ---
 
