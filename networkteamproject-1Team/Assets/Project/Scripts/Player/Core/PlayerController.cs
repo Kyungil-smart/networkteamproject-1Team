@@ -11,7 +11,7 @@ namespace Player
         // 컴포넌트 선언
         private PlayerInputHandler _input;
         private PlayerMovement     _movement;
-        // private PlayerCamera       _camera;
+        private PlayerCamera       _camera;
         // private PlayerAnimation    _animation;
         // private PlayerCombat       _combat;
         // private PlayerHealth       _health;
@@ -23,7 +23,7 @@ namespace Player
             // 캐싱 실행
             _input      = GetComponent<PlayerInputHandler>();
             _movement   = GetComponent<PlayerMovement>();
-            // _camera     = GetComponent<PlayerCamera>();
+            _camera     = GetComponent<PlayerCamera>();
             // _animation  = GetComponent<PlayerAnimation>();
             // _combat     = GetComponent<PlayerCombat>();
             // _health     = GetComponent<PlayerHealth>();
@@ -36,7 +36,7 @@ namespace Player
             {
                 // 다른 클라이언트의 플레이어 — 입력/카메라/마우스 룩 비활성
                 _input.enabled  = false;
-                // _camera.enabled = false;
+                _camera.enabled = false;
                 return;
             }
             

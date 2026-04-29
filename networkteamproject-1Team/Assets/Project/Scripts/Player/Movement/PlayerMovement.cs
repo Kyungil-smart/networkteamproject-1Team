@@ -102,8 +102,13 @@ namespace Player
                 ? (transform.right * _moveInput.x + transform.forward * _moveInput.y).normalized
                 : Vector3.zero;
             
-            _controller.Move(inputDir * (targetSpeed * Time.deltaTime)
-                             + Vector3.up * (_verticalVelocity * Time.deltaTime));
+            CollisionFlags flags = _controller.Move(
+                inputDir * (targetSpeed * Time.deltaTime)
+                + Vector3.up * (_verticalVelocity * Time.deltaTime));
+    
+            // 천장 충돌 시 즉시 낙하 전환
+            if ((flags & CollisionFlags.Above) != 0 && _verticalVelocity > 0f)
+                _verticalVelocity = 0f;
         }
     }
 }
