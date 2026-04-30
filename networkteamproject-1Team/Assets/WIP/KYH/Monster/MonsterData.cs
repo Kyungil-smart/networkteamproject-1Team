@@ -10,4 +10,7 @@ public class MonsterData
     public float idleTime;
     public float chaseRange;
     public float attackRange;
+    public int attackDamage;
+    public float attackCooldown;
+    public bool isAttacking;
 }
