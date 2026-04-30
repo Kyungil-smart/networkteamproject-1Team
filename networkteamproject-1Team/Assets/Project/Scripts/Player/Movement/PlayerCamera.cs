@@ -9,21 +9,30 @@ namespace Player
         [Header("ViewPoints (각 모델별)")]
         [SerializeField] private Transform _viewPointA;
         [SerializeField] private Transform _viewPointB;
-
+        
+        [Header("Head Bones (각 모델별)")]
+        [SerializeField] private Transform _headBoneA;
+        [SerializeField] private Transform _headBoneB;
+        
+        // 헤드 본 기준 로컬 좌표계의 오프셋
+        private Vector3 _viewPointLocalOffset;
+        
         [Header("Look")]
         [SerializeField] private float _upClamp = -80f;
         [SerializeField] private float _downClamp = 80f;
         [SerializeField] private float _mouseSensitivity = 0.3f;
 
+        private Transform _activeHeadBone; // 현재 활성화된 머리뼈
         private CinemachineCamera _virtualCamera;
         private Transform _activeViewPoint;
+        
         private float _yaw;
         private float _pitch;
         private bool _isOwnerView;
         
         public float YawAngle => _yaw;
         public Transform ViewPoint => _activeViewPoint;
-
+        
         public void SetupOwnerView()
         {
             if (_viewPointA == null)
@@ -31,9 +40,19 @@ namespace Player
                 Debug.LogError("[PlayerCamera] ViewPoint_A is not assigned.");
                 return;
             }
-            
+            if (_headBoneA == null)  // ← 추가
+            {
+                Debug.LogError("[PlayerCamera] HeadBone_A is not assigned.");
+                return;
+            }
             // 초기 ViewPoint = A (기본 모델)
             _activeViewPoint = _viewPointA;
+            
+            _activeHeadBone = _headBoneA;
+            
+            // 할당된 A 뼈대를 기준으로 오프셋 캡처
+            _viewPointLocalOffset = _activeHeadBone.InverseTransformPoint(_activeViewPoint.position);
+            
             AssignToVirtualCamera();
             
             // B 전환 이벤트 구독
@@ -57,10 +76,6 @@ namespace Player
             }
         
             _virtualCamera.Target.TrackingTarget = _activeViewPoint;
-        
-            // Near Clip 설정 (메인 카메라에)
-            if (UnityEngine.Camera.main != null)
-                UnityEngine.Camera.main.nearClipPlane = 0.05f;
         }
         
         private void SwitchToB()
@@ -71,6 +86,11 @@ namespace Player
                 return;
             }
             _activeViewPoint = _viewPointB;
+            _activeHeadBone = _headBoneB;
+            
+            // 할당된 B 뼈대를 기준으로 오프셋 캡처
+            _viewPointLocalOffset = _activeHeadBone.InverseTransformPoint(_activeViewPoint.position);
+
             AssignToVirtualCamera();  // 카메라 재부착
         }
         
@@ -88,9 +108,12 @@ namespace Player
 
         private void LateUpdate()
         {
-            // 위치는 Position Constraint가 자동 추적
-            // 회전만 마우스 룩으로 직접 적용
-            if (!_isOwnerView || _activeViewPoint == null) return; 
+            // 위치: 헤드 본을 직접 추적
+            // 회전: 마우스 룩 독립 처리
+            if (!_isOwnerView || _activeViewPoint == null || _activeHeadBone == null) return; 
+            
+            // 캡처한 오프셋 기준으로 헤드 본 위치 추적
+            _activeViewPoint.position = _activeHeadBone.TransformPoint(_viewPointLocalOffset);
             _activeViewPoint.rotation = Quaternion.Euler(_pitch, _yaw, 0f);
         }
 

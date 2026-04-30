@@ -28,7 +28,6 @@ namespace Player
         private Vector2 _moveInput;
         private bool _isSprinting;
         private bool _jumpRequested;
-        private float _verticalVelocity;
         private float _lastJumpTime;
         private float _rotationVelocity;
         private float _currentSpeed;
@@ -38,7 +37,8 @@ namespace Player
         public float CurrentSpeed => _currentSpeed;
         public float MotionSpeed => _moveInput == Vector2.zero ? 0f : 1f;
         public bool JustJumped { get; private set; }
-        
+        public float VerticalVelocity { get; private set; }
+
         // 캐싱
         private void Awake()
         {
@@ -77,18 +77,18 @@ namespace Player
             
             if (_controller.isGrounded)
             {
-                if (_verticalVelocity < 0f) _verticalVelocity = -2f;
+                if (VerticalVelocity < 0f) VerticalVelocity = -2f;
                 
                 if (canMove && _jumpRequested && Time.time >= _lastJumpTime + _jumpCooldown)
                 {
-                    _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * Gravity);
+                    VerticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * Gravity);
                     _lastJumpTime = Time.time;
                     JustJumped = true;
                 }
             }
             else
             {
-                _verticalVelocity += Gravity * Time.deltaTime;
+                VerticalVelocity += Gravity * Time.deltaTime;
             }
             _jumpRequested = false;
         }
@@ -106,11 +106,11 @@ namespace Player
             
             CollisionFlags flags = _controller.Move(
                 inputDir * (targetSpeed * Time.deltaTime)
-                + Vector3.up * (_verticalVelocity * Time.deltaTime));
+                + Vector3.up * (VerticalVelocity * Time.deltaTime));
     
             // 천장 충돌 시 즉시 낙하 전환
-            if ((flags & CollisionFlags.Above) != 0 && _verticalVelocity > 0f)
-                _verticalVelocity = 0f;
+            if ((flags & CollisionFlags.Above) != 0 && VerticalVelocity > 0f)
+                VerticalVelocity = 0f;
         }
     }
 }
