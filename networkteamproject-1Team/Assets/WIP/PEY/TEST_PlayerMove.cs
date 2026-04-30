@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
-using Unity.Cinemachine;
 using UnityEngine.Rendering;
 using Unity.Netcode.Components;
+using UnityEngine.Audio;
 
 public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
 {
@@ -26,9 +26,11 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     public float jumpCooldown = 1.5f;
     float _lastJumpTime;
 
+    [Header("Audio")]
+    [SerializeField] AudioResource _footStep;
+
     // 컴포넌트
     Animator _ac;
-    NetworkAnimator _networkAc;
     CharacterController _controller;
 
     // 내부 상태
@@ -95,6 +97,7 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     public override void OnNetworkDespawn()
     {
         if (!IsOwner) return;
+        _camObj.transform.SetParent(null); // 플레이어가 파괴될 때 시네머신/카메라가 같이 파괴되지 않도록 최상단으로 분리
 
         input.onMove -= OnMove;
         input.onJump -= OnJump;
@@ -116,23 +119,21 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
 
 
     // ────────────────────────────────────────────
+    GameObject _camObj;
     void SetupCinemachineCamera()
     {
-        GameObject camObj = GameObject.FindWithTag("GameController");
-        if (camObj == null) // 씬에 카메라가 디스폰으로 파괴되었다면 새로 생성
-        {
-            camObj = new GameObject("CinemachineCamera");
-            camObj.AddComponent<CinemachineCamera>();
-        }
+        _camObj = GameObject.FindWithTag("GameController");
 
-        camObj.transform.SetParent(_cameraPos.transform, false);
-        camObj.transform.localPosition = Vector3.zero;
-        camObj.transform.localRotation = Quaternion.identity;
+        _camObj.transform.SetParent(_cameraPos.transform, false);
+        _camObj.transform.localPosition = Vector3.zero;
+        _camObj.transform.localRotation = Quaternion.identity;
 
         // 자기 머리 보이지 않도록 설정
         _headMesh.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
         //Cursor.lockState = CursorLockMode.Locked;
     }
+
+
 
     private void OnMove(Vector2 value) => _moveInput = value;
 
@@ -205,6 +206,7 @@ public class TEST_PlayerMove : NetworkBehaviour, INetworkUpdateSystem
     // 애니메이션 이벤트 리시버 (추후 사운드 재생 시)
     private void OnFootstep(AnimationEvent animationEvent)
     {
+        AudioManager.Instance.PlaySfxWet(_footStep, this.transform.position);
     }
 
     private void OnLand(AnimationEvent animationEvent)

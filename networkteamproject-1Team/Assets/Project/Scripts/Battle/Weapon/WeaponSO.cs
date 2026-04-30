@@ -9,12 +9,13 @@ public class WeaponSO : ScriptableObject
     public float range;
     public float cooltime;
 
+    [Header("오디오")]
+    public AudioResource attackMiss;
+    public AudioResource attackHit;
+    public AudioResource attackBlocked;
+
     // 총기류 확장시 사용
     // public int maxAmmo;
     // public int magCapacity;
     // public float reloadTime;
-
-    // 연출
-    public AudioResource attackClip;
-    //public AudioResource reloadClip;
 }

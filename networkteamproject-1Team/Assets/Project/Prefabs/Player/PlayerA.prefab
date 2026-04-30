@@ -85,8 +85,8 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 1.96
-  m_Radius: 0.19
+  m_Height: 1.75
+  m_Radius: 0.23
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -112,7 +112,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.23
-  m_Height: 1.96
+  m_Height: 1.85
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!114 &1597624042627408676
@@ -249,6 +249,7 @@ MonoBehaviour:
   _downClamp: 70
   _mouseSensitivity: 0.09
   jumpCooldown: 1.5
+  _footStep: {fileID: 6418180475301049370, guid: 5db78ea202abebb449023b5247c15a27, type: 2}
   input: {fileID: 11400000, guid: f3dea7d9139022049872a40ab03fa674, type: 2}
 --- !u!114 &-7052952521405045591
 MonoBehaviour:
@@ -289,7 +290,6 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  hitClip: {fileID: 0}
 --- !u!114 &8397419552652158665
 MonoBehaviour:
   m_ObjectHideFlags: 0
