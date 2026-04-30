@@ -29,7 +29,6 @@ public partial class LocalManager : MonoBehaviour
     public virtual void Start()
     {
         if (NetworkManager.Singleton == null) return; // 테스트 씬 오류 방지
-        RelayNetworkService.InitializeAsync().Forget();
 
         NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;

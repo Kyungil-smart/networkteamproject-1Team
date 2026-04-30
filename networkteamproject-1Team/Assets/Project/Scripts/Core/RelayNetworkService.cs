@@ -11,22 +11,18 @@ using Cysharp.Threading.Tasks;
 
 public static partial class RelayNetworkService
 {
-    public static async UniTaskVoid InitializeAsync()
+    public static async UniTask InitializeAsync()
     {
-        try
+        if (UnityServices.State != ServicesInitializationState.Initialized)
         {
             await UnityServices.InitializeAsync();
-
-            if (!AuthenticationService.Instance.IsSignedIn)
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-            Debug.Log($"[Auth] 로그인 완료: {AuthenticationService.Instance.PlayerId}");
         }
-        catch (Exception e)
+
+        if (!AuthenticationService.Instance.IsSignedIn)
         {
-            Debug.LogError($"[Auth] 초기화 실패: {e.Message}");
-            throw;
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
+        Debug.Log($"[Auth] 로그인 완료: {AuthenticationService.Instance.PlayerId}");
     }
 
     public static async UniTask<string> StartHostWithRelayAsync(int maxConnections = 5)
