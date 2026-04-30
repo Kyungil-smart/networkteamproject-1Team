@@ -24,6 +24,10 @@ public class MonsterController : NetworkBehaviour
     
     public NetworkVariable<StateType> currentState = new NetworkVariable<StateType>(
         writePerm: NetworkVariableWritePermission.Server);
+    
+    public NetworkVariable<int> attackRand = new NetworkVariable<int>(
+        writePerm: NetworkVariableWritePermission.Server);
+    
     public MonsterAI MonsterAI { get; private set; }
     public MonsterAttack MonsterAttack { get; private set; }
     
@@ -130,9 +134,24 @@ public class MonsterController : NetworkBehaviour
                 break;
             case StateType.Attack:
                 _anim.SetFloat("MoveSpeed", 0f);
+                AttackAnimRandServerRpc();
                 _anim.SetTrigger("Attack");
                 break;
         }
+    }
+
+    [ServerRpc]
+    public void AttackAnimRandServerRpc()
+    {
+        attackRand.Value = UnityEngine.Random.Range(0, 2);
+        
+        AnimRandClientRpc(attackRand.Value);
+    }
+
+    [ClientRpc]
+    public void AnimRandClientRpc(int rand)
+    {
+        _anim.SetInteger("AttackRand", rand);
     }
 
     [ClientRpc]

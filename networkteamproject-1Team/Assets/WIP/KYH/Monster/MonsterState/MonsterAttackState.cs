@@ -37,6 +37,7 @@ public class MonsterAttackState : IState
         
         if (_timer >= _monsterController.MonsterData.attackCooldown)
         {
+            _monsterController.AttackAnimRandServerRpc();
             _monsterController.TriggerAttackClientRpc();
             _timer = 0;
         }
