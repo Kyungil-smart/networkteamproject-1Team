@@ -335,6 +335,10 @@ Position Constraint 컴포넌트 제거 후 PlayerCamera의 LateUpdate에서 직
 #### 영향
 - 다른 시스템에 영향없이 동작 결과 동일
 
+#### 안전장치 개선
+- 프리팹에서 처음에 A가 꺼져있을 경우 켜지지 않는 문제 발생.
+- 기존에  ApplyNormalAvatar()으로 노말 아바타로 초기화 하는 함수를 Awake 시점에 호출하여 해결
+
 ---
 
 ### PlayerAnimation 구현

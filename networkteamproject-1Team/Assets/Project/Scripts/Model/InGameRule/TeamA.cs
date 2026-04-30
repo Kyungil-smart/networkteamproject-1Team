@@ -21,9 +21,8 @@ public class TeamA : TeamBase
     {
         _rootAnimator = GetComponent<Animator>();
         
-        // 시작 시점에 normal avatar 명시적 설정 (안전장치)
-        if (_normalAvatar != null)
-            _rootAnimator.avatar = _normalAvatar;
+        // 시작 시점에 normal avatar 명시적 설정 및 꺼져있을지 모를 모델 활성화 (안전장치)
+        ApplyNormalAvatar(); 
     }
 
     protected override void OnTeamSetup(TeamType team) // 팀 배정 시 모든 클라이언트에서 호출됨
