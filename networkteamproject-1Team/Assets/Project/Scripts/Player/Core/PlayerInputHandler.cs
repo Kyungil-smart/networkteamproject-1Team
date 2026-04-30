@@ -25,8 +25,6 @@ namespace Player
         // 카메라 관련 입력 추가시 생성
         // private PlayerCamera _camera;
         
-        private bool _lastSprintState;
-        
         // 하위 모듈 생성자 할당 및 초기화
         public void Initialize(PlayerMovement move)
         {
@@ -40,8 +38,8 @@ namespace Player
         void BindEvents()
         {
             _input.Enable();
-            _input.onMove += OnMove;
-            _input.onJump += OnJump; 
+            _input.onMove          += OnMove;
+            _input.onJump          += OnJump; 
             _input.onSprintChanged += OnSprintChanged;
         }
         
@@ -50,7 +48,7 @@ namespace Player
         {
             // _input이 없다면 할당 해제할 이벤트도 없으므로 return
             if (_input == null) return;
-            _input.onMove -= OnMove;
+            _input.onMove          -= OnMove;
             _input.onJump          -= OnJump;
             _input.onSprintChanged -= OnSprintChanged;
             
