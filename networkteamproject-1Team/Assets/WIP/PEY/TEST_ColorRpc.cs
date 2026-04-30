@@ -37,6 +37,6 @@ public class TEST_ColorRpc : NetworkBehaviour
     private void ApplyColorClientRpc(float r, float g, float b)
     {
         if (_renderer == null) return;
-        _renderer.material.color = new Color(r, g, b);
+        _renderer.sharedMaterial.color = new Color(r, g, b);
     }
 }

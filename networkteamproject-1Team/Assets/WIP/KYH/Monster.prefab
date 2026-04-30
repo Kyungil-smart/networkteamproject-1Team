@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2921039388923809814}
   - component: {fileID: 8878437906756581081}
   - component: {fileID: 2059705544896303651}
+  - component: {fileID: -1467537008743170300}
   - component: {fileID: 1074796108599209511}
   m_Layer: 0
   m_Name: Monster
@@ -57,7 +58,7 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 2
-  m_BaseOffset: 0
+  m_BaseOffset: -0.1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!114 &5465089528741182997
@@ -149,9 +150,17 @@ MonoBehaviour:
     speed: 0
     offset: {x: 0, y: 1, z: 0}
     idleTime: 5
-    chaseRange: 5
-    attackRange: 2
+    chaseRange: 8
+    attackRange: 3
+    attackDamage: 40
+    attackCooldown: 2.5
+    isAttacking: 0
   currentState:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  attackRand:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
@@ -168,6 +177,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: feeab8a0fc12a13448b7549d400fca60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterAI
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &-1467537008743170300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7715287895704808701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 325585a43264734419465570c8962369, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterAttack
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!136 &1074796108599209511
 CapsuleCollider:
@@ -255,8 +277,28 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3490026887102114920, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7644915096233246141}
   m_SourcePrefab: {fileID: 100100000, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
+--- !u!1 &8385440723659635533 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3490026887102114920, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}
+  m_PrefabInstance: {fileID: 4913428428207363877}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7644915096233246141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8385440723659635533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29cdd53c9d96b5941bbe455602d9c819, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterAnimationEvents
 --- !u!4 &8385440723659663213 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3490026887102541896, guid: e0a2ae8d8ae1c1f4b83e337da0b6f6b4, type: 3}

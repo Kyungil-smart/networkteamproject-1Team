@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 namespace Player
 {
     [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(PlayerCamera))]
     public class PlayerMovement : MonoBehaviour
     {
         [Header("Movement")]
@@ -19,7 +20,7 @@ namespace Player
         
         private CharacterController _controller;
         // 카메라 연결
-        // private PlayerCamera _camera;
+        private PlayerCamera _camera;
         // 전투 연결
         // private PlayerCombat _combat;
         
@@ -42,7 +43,7 @@ namespace Player
         private void Awake()
         {
             _controller = GetComponent<CharacterController>();
-            // _camera = GetComponent<PlayerCamera>();
+            _camera = GetComponent<PlayerCamera>();
             // _combat = GetComponent<PlayerCombat>();
         }
         
@@ -64,8 +65,9 @@ namespace Player
         {
             // 회전 구현
             // 카메라 yaw 따라 캐릭터 본체 회전
+            float cameraYaw = _camera.YawAngle;
             float smoothAngle = Mathf.SmoothDampAngle(
-                transform.eulerAngles.y, Mouse.current.position.x.value, ref _rotationVelocity, _rotationSmoothTime);
+                transform.eulerAngles.y, cameraYaw, ref _rotationVelocity, _rotationSmoothTime);
             transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
         }
         
@@ -102,8 +104,13 @@ namespace Player
                 ? (transform.right * _moveInput.x + transform.forward * _moveInput.y).normalized
                 : Vector3.zero;
             
-            _controller.Move(inputDir * (targetSpeed * Time.deltaTime)
-                             + Vector3.up * (_verticalVelocity * Time.deltaTime));
+            CollisionFlags flags = _controller.Move(
+                inputDir * (targetSpeed * Time.deltaTime)
+                + Vector3.up * (_verticalVelocity * Time.deltaTime));
+    
+            // 천장 충돌 시 즉시 낙하 전환
+            if ((flags & CollisionFlags.Above) != 0 && _verticalVelocity > 0f)
+                _verticalVelocity = 0f;
         }
     }
 }

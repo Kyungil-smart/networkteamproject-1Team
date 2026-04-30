@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
@@ -23,8 +24,13 @@ public class MonsterController : NetworkBehaviour
     
     public NetworkVariable<StateType> currentState = new NetworkVariable<StateType>(
         writePerm: NetworkVariableWritePermission.Server);
+    
+    public NetworkVariable<int> attackRand = new NetworkVariable<int>(
+        writePerm: NetworkVariableWritePermission.Server);
+    
     public MonsterAI MonsterAI { get; private set; }
-
+    public MonsterAttack MonsterAttack { get; private set; }
+    
     public MonsterIdleState IdleState { get; private set; }
     public MonsterPatrolState PatrolState { get; private set; }
     public MonsterChaseState ChaseState { get; private set; }
@@ -50,7 +56,7 @@ public class MonsterController : NetworkBehaviour
         _state.Update();
     }
     
-    private void OnDisable()
+    public override void OnNetworkDespawn()
     {
         currentState.OnValueChanged -= OnStateChanged;
     }
@@ -59,6 +65,7 @@ public class MonsterController : NetworkBehaviour
     {
         _state = new StateMachine();
         MonsterAI = GetComponent<MonsterAI>();
+        MonsterAttack = GetComponent<MonsterAttack>();
         _anim = GetComponentInChildren<Animator>();
         _layerMask = LayerMask.GetMask("Player");
         _path = FindAnyObjectByType<PathSettingManager>();
@@ -122,20 +129,40 @@ public class MonsterController : NetworkBehaviour
         switch (newState)
         {
             case StateType.Patrol:
-                _anim.SetBool("Attack", false);
-                _anim.SetFloat("MoveSpeed", 1f);
-                break;
             case StateType.Chase:
-                _anim.SetBool("Attack", false);
                 _anim.SetFloat("MoveSpeed", 1f);
                 break;
             case StateType.Attack:
                 _anim.SetFloat("MoveSpeed", 0f);
-                _anim.SetBool("Attack", true);
-                int rand = UnityEngine.Random.Range(0, 2);
-                _anim.SetInteger("AttackRand", rand);
+                AttackAnimRandServerRpc();
+                _anim.SetTrigger("Attack");
                 break;
         }
+    }
+
+    [ServerRpc]
+    public void AttackAnimRandServerRpc()
+    {
+        attackRand.Value = UnityEngine.Random.Range(0, 2);
+        
+        AnimRandClientRpc(attackRand.Value);
+    }
+
+    [ClientRpc]
+    public void AnimRandClientRpc(int rand)
+    {
+        _anim.SetInteger("AttackRand", rand);
+    }
+
+    [ClientRpc]
+    public void TriggerAttackClientRpc()
+    {
+        _anim.SetTrigger("Attack");
+    }
+
+    public void OnAttackHit()
+    {
+        MonsterAttack.Attack();
     }
 
     public float DistanceToPlayer()
@@ -147,6 +174,18 @@ public class MonsterController : NetworkBehaviour
     {
         if (_path.pathSettings.Count == 0) return;
         MonsterData.patrolPoints = _path.pathSettings;
+    }
+
+    public void AttackCor()
+    {
+        StartCoroutine(Attacking());
+    }
+
+    private IEnumerator Attacking()
+    {
+        yield return new WaitForSeconds(MonsterData.attackCooldown);
+        
+        MonsterData.isAttacking = false;
     }
 
     private void OnDrawGizmos()

@@ -36,7 +36,7 @@ public class MonsterPatrolState : IState
 
     private void Patrol()
     {
-        if (_monsterController.MonsterData.patrolPoints == null) return;
+        if (_monsterController.MonsterData.patrolPoints == null || _monsterController.MonsterData.isAttacking) return;
         
         _monsterController.MonsterAI.Agent.SetDestination(
             _monsterController.MonsterData.patrolPoints[_patrolIndex]);

@@ -19,7 +19,7 @@ public class MonsterAI : NetworkBehaviour
 
     private void Update()
     {
-        if (IsDetected) ChasePlayer(Target);
+        if (IsDetected && !_monsterController.MonsterData.isAttacking) ChasePlayer(Target);
         Target = _monsterController.DetectPlayer();
     }
     
