@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Player
@@ -21,9 +20,10 @@ namespace Player
         
         // 하위로 입력을 받는 모듈 선언
         private PlayerMovement _movement;
-        // 카메라
-        // 전투
         // 상호작용
+        // 전투
+        // 카메라 관련 입력 추가시 생성
+        // private PlayerCamera _camera;
         
         private bool _lastSprintState;
         
@@ -40,7 +40,9 @@ namespace Player
         void BindEvents()
         {
             _input.Enable();
-             _input.onMove += OnMove;
+            _input.onMove += OnMove;
+            _input.onJump += OnJump; 
+            _input.onSprintChanged += OnSprintChanged;
         }
         
         // 이동 관련 이벤트 할당 해제(메모리 누수 방지)
@@ -49,36 +51,21 @@ namespace Player
             // _input이 없다면 할당 해제할 이벤트도 없으므로 return
             if (_input == null) return;
             _input.onMove -= OnMove;
-            _input.onJump          += OnJump;
-            // _input.onAttack        += OnAttack;
-            // _input.onInteract      += OnInteractStart;
-            // _input.Interact        += OnInteractTick;
-            // _input.offInteract     += OnInteractCancel;
-            // _input.onSprintChanged += OnSprintChanged;
-        }
-        
-        private void Update()
-        {
-            // TODO: BattleInputReader에 onSprintChanged 이벤트 추가 후 이벤트 구독으로 전환
-            // 다른 팀원의 BattleInputReader 작업이 마무리되면 박언약과 합의하여 변경 예정
-            if (_input == null || _movement == null) return;
+            _input.onJump          -= OnJump;
+            _input.onSprintChanged -= OnSprintChanged;
             
-            bool currentSprint = _input.isSprint;
-            if (currentSprint != _lastSprintState)
-            {
-                // _movement.SetSprint(currentSprint);
-                _lastSprintState = currentSprint;
-            }
+            // _input.onAttack        -= OnAttack;
+            // _input.onStartInteract    -= OnInteractStart;
+            // _input.onCanceledInteract -= OnInteractCancel;
         }
         
         // 이벤트 할당 함수(람다식 연결)
-        void OnMove(Vector2 v) => _movement.SetMoveInput(v);
+        private void OnMove(Vector2 v) => _movement?.SetMoveInput(v);
         private void OnJump() => _movement?.RequestJump();
         private void OnSprintChanged(bool b) => _movement?.SetSprint(b);
         
         // private void OnAttack() => _combat?.RequestAttack();
         // private void OnInteractStart() => _interactor?.OnInteractStart();
-        // private void OnInteractTick() => _interactor?.OnInteractTick();
         // private void OnInteractCancel() => _interactor?.OnInteractCancel();
     }
 }

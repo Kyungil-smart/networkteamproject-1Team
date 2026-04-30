@@ -51,7 +51,6 @@ public abstract class TeamBase : NetworkBehaviour
             cam.cullingMask |=  1 << LAYER_A;
             cam.cullingMask &= ~(1 << LAYER_B);
         }
-        Debug.Log($"[{GetType().Name}] 팀 {team} 시야 적용");
     }
 
     [ClientRpc]

@@ -170,13 +170,13 @@ draw.io를 통해 사전 구조 설계.
 - 프리팹 충돌 방지를 위해 개인별 네트워크 프리팹 리스트를 활용한 독립 작업 및 추후 병합으로 합의.
 - 본격적인 플레이어 개발을 위한 폴더 생성 및 임시 개인 작업용 네트워크 프리팹 리스트 생성
 
-## 플레이어 컨트롤러 제작 시작
+### 플레이어 컨트롤러 제작 시작
 
 어제 작업한 구조 설계를 기반으로 스크립트 생성
 
 ---
 
-### **PlayerController 구현**
+#### **PlayerController 구현**
 
 - **역할:** 플레이어 오브젝트의 최상단 에이전트(`NetworkBehaviour`)로서, 필수 컴포넌트 캐싱 및 하위 모듈 간의 **의존성 주입(DI)을 전담**하는 컨트롤 타워.
 - **구현 흐름:**
@@ -188,7 +188,7 @@ draw.io를 통해 사전 구조 설계.
 
 ---
 
-### **PlayerInputHandler 구현**
+#### **PlayerInputHandler 구현**
 
 - **역할:** `BattleInputReader` (SO)로부터 입력 이벤트를 수신하여 이동, 카메라, 전투, 상호작용 등 개별 행동 모듈로 신호를 전달하는 **라우팅 및 관리 계층**.
 - **구현 흐름:**
@@ -200,7 +200,7 @@ draw.io를 통해 사전 구조 설계.
 
 ---
 
-### **PlayerMovement 구현**
+#### **PlayerMovement 구현**
 
 - **역할:** `CharacterController`를 기반으로 캐릭터의 물리적 이동, 점프, 중력 및 회전 로직을 직접 수행하는 **실제 행동 모듈**.
 - **구현 흐름:**
@@ -213,17 +213,81 @@ draw.io를 통해 사전 구조 설계.
 #### **가속도 및 점프 속도($\sqrt{h \cdot -2g}$) 공식 설명**
 - 목표 높이($h$)에 도달하기 위해 필요한 수직 시작 속도($v$)를 계산.
 
+## Day6 — 2026-04-29
+
+### BattleInputReader 수정
+
+팀원이 만든 인풋 액션 SO를 합의하에 수정.
+
+- `event Action<bool> onSprintChanged` 추가
+- `OnSprint` 콜백 내에서 이전 상태(`isSprint`)와 현재 입력값을 비교하여 **변화가 있을 때만** 값 갱신 + 이벤트 발행
+- 기존 `isSprint` 변수는 호환성 유지를 위해 그대로 두되 프로퍼티로 외부 수정 방지.
+
+```csharp
+public void OnSprint(InputAction.CallbackContext context)
+{
+    bool newSprint = context.ReadValueAsButton();
+    if (newSprint != isSprint)
+    {
+        isSprint = newSprint;
+        onSprintChanged?.Invoke(isSprint);
+    }
+}
+```
+
+> 외부에서 sprint 입력 변화 시점에만 이벤트로 수신 가능 → 매 프레임 호출 불필요.
+
+### PlayerInputHandler 이벤트 기반 전환
+
+기존 Update에서 매 프레임 `_input.isSprint` 폴링하던 방식을 제거하고 `onSprintChanged` 이벤트 구독으로 변경.
+
+- **Update 메서드 제거** — 모든 입력 처리가 이벤트 기반으로 통일
+- Jump 액션 이벤트 할당 누락 발견 → 추가
+
 ---
 
-### **PlayerAnimation 구현**
+### **PlayerMovement 보강 — 천장 충돌 처리**
 
-- **역할**:
-- **구현 흐름**:
-- **활용**:
+테스트 중 점프 시 천장 부딪힘에서 잠깐 달라붙는 느낌 발견. `CharacterController.Move`의 반환 `CollisionFlags`로 `Above` 충돌을 감지하여, 상승 중일 때만 `_verticalVelocity`를 0으로 강제 변경. 즉시 낙하 전환되어 자연스러운 점프 종료.
 
 ---
 
 ### **PlayerCamera 구현**
+
+- **역할**: ViewPoint 오브젝트를 활용한 1인칭 카메라 시점 모듈. VRChat 데스크톱 카메라처럼 캐릭터의 눈 위치에 뷰포인트를 두고, 시네머신 카메라가 이를 추적.
+
+- **구현 흐름**:
+    - **[ViewPoint 셋업(프리팹)]** Position Constraint를 활용해 머리 본을 Source로 잡고, 눈 중앙 쯤에 위치하도록 Offset 설정. 카메라의 **위치만** ViewPoint를 따라가고, **회전은 마우스 델타값으로 독립** 처리.
+    - **[A/B 팀별 뷰포인트]** A/B 분리 구조 특성상 본 구조가 다르므로 팀별로 ViewPoint를 별도 생성(`ViewPoint_A`, `ViewPoint_B`). 본인이 어느 팀인지 체크하여 해당 ViewPoint를 카메라 타겟으로 할당.
+    - **[Owner 시점 처리(SetupOwnerView)]** 카메라는 플레이어 스폰 전 대기 상태로 두었다가, Owner 캐릭터 스폰 시 팀 정보를 확인하고 해당 ViewPoint에 시네머신 카메라 부착.
+    - **[회전 적용(LateUpdate)]** 마우스 델타 누적값으로 yaw/pitch 갱신. 애니메이션이 본 위치를 갱신한 뒤 ViewPoint의 회전을 강제 적용.
+
+- **활용**: 캐릭터 본체 회전이 카메라 yaw를 따라가도록 Movement에서 처리하므로, 캐릭터 회전과 카메라 회전이 자연스럽게 일치.
+
+#### 설계 결정 사항
+
+**[시네머신 카메라 부착 방식: 씬 배치 + Target 갱신]**  
+플레이어 자식으로 카메라를 두는 방식 대신 **씬에 시네머신 카메라를 1개 배치하고 Target만 갈아끼우는 방식** 채택.  
+**이유**:
+- 다중 플레이어 환경에서 카메라 인스턴스가 플레이어 수만큼 생기는 문제 회피
+- 추후 관전 시점 / 결과 화면 / 컷씬 카메라 추가 시 Target 전환만으로 대응 가능
+- 카메라 흔들림(Impulse) 등 외부 카메라 효과 시스템과 통합 용이
+
+**[시네머신 Position/Rotation Control 선정]**  
+- Position Control: `Hard Lock To Target` — 1인칭 시점은 보간(Damping) 없이 즉시 추적해야 흐물거림 없음
+- Rotation Control: `Same As Follow Target` — Target(ViewPoint)의 회전을 그대로 사용. `Hard Look At`은 Target을 *바라보는* 회전이라 의도와 다름 (위치가 같으면 LookAt 방향 미정의로 오작동 가능)
+
+**[CharacterController Radius 증가]**  
+1인칭 시점에서 시야가 벽 안쪽으로 들어가 컬링되는 현상 방지를 위해 반경 증가. 카메라 NearClipPlane을 짧게(0.05) 두어도 캐릭터가 벽에 너무 가까이 붙으면 카메라 위치 자체가 콜라이더 밖으로 나가는 문제 발생 → 반경을 적정 수준으로 늘려 시점이 항상 콜라이더 내부에 위치하도록 보정.
+
+**[CharacterController 채택 (vs Rigidbody)]**  
+이전 OverTheSky 프로젝트에서 Rigidbody 기반 컨트롤러를 직접 구현했으나, 본 프로젝트는 호러 탐험 + 즉발 점프 위주라 물리 시뮬레이션 불필요. CharacterController의 빠른 반응성·간결한 API가 적합.
+
+> **추후 폴리싱**: 상하 회전 시 카메라만 회전시키는 현재 방식에 캐릭터 Spine 본을 적정 수치로 IK 보정 추가하면 더 자연스러운 연출 가능 (다른 클라이언트가 봤을 때 위/아래 시선이 표현됨).
+
+---
+
+### **PlayerAnimation 구현**
 
 - **역할**:
 - **구현 흐름**:
