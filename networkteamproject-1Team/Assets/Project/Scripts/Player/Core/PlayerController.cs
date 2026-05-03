@@ -12,7 +12,7 @@ namespace Player
         private PlayerInputHandler _input;
         private PlayerMovement     _movement;
         private PlayerCamera       _camera;
-        // private PlayerAnimation    _animation;
+        private PlayerAnimation    _animation;
         // private PlayerInteractor   _interactor;
         // private PlayerCombat       _combat;
         // private PlayerHealth       _health;
@@ -24,7 +24,7 @@ namespace Player
             _input      = GetComponent<PlayerInputHandler>();
             _movement   = GetComponent<PlayerMovement>();
             _camera     = GetComponent<PlayerCamera>();
-            // _animation  = GetComponent<PlayerAnimation>();
+            _animation  = GetComponent<PlayerAnimation>();
             // _interactor = GetComponent<PlayerInteractor>();
             // _combat     = GetComponent<PlayerCombat>();
             // _health     = GetComponent<PlayerHealth>();
