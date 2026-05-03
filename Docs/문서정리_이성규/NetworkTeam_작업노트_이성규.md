@@ -287,11 +287,89 @@ public void OnSprint(InputAction.CallbackContext context)
 
 ---
 
-### **PlayerAnimation 구현**
+### PlayerCamera 보강 — Position Constraint → LateUpdate 직접 추적
 
-- **역할**:
+#### 이슈
+이동 애니메이션 적용 후 Position Constraint가 헤드 본을 완벽히 따라가지 못하는 현상 확인. 점프 등 빠른 본 위치 변화 시 머리 메쉬가 잠깐 노출됨.
+
+#### 원인 분석 — Unity 실행 순서
+1. Update (스크립트 로직)
+2. Animator (본 위치 갱신) — 헤드 본이 새 위치로
+3. LateUpdate (스크립트)
+4. Constraints 평가 — Position Constraint 여기서 동작
+5. 렌더링
+
+Position Constraint는 Animator 이후 평가되지만, 빠른 본 변화 시 이전 프레임 위치를 기준으로 계산하여 프레임 지연이 누적될 수 있음.
+
+#### 해결 — LateUpdate 직접 추적
+Position Constraint 컴포넌트 제거 후 PlayerCamera의 LateUpdate에서 직접 위치 갱신. 같은 프레임 내에서 위치 + 회전 동시 처리하여 지연 원천 차단.
+
+흐름:
+1. 프리팹에서 ViewPoint를 헤드 본 위치 근처(눈 중앙)에 시각적 배치
+2. 시작 시점(`SetupOwnerView`)에 `InverseTransformPoint`로 헤드 본 기준 로컬 오프셋 캡처
+3. 매 LateUpdate에서 `TransformPoint`로 오프셋을 다시 적용해 헤드 본 위치 추적
+4. A→B 전환 시 새 헤드 본 기준으로 오프셋 재캡처
+
+#### 헤드 본 참조 방식 — 인스펙터 할당
+`Animator.GetBoneTransform` 사용 안 함. avatar 교체 시점에 본 캐싱이 갱신되는 타이밍 문제가 있어 의존성·예측 가능성 측면에서 인스펙터 할당이 우위.
+
+> **시행착오 가치**: Constraint 사용 → 한계 발견 → LateUpdate 전환의 흐름이 프레임 지연 이슈에 대한 명확한 해결 동선이 됨.
+
+---
+
+### TeamA Avatar 교체 방식 개선
+### 배경
+플레이어 작업 중 팀원의 TeamA 코드에서 책임 분리 측면 개선 여지 발견. 해당 팀원과 협의 후 직접 수정 진행.
+
+#### 기존 방식의 문제
+- 자식 GameObject(`_monsterModel`)에 비활성 Animator 컴포넌트가 존재하며 avatar 데이터 보관 용도로만 사용됨
+- Animator 컴포넌트가 본래 목적(애니메이션 동작) 외 데이터 저장소로 우회 사용
+- `_monsterModel`이 메쉬 표시 + avatar 보관 두 가지 책임을 가짐
+
+#### 개선
+- Avatar를 인스펙터에서 직접 할당
+- `_monsterModel`은 메쉬 토글 전담으로 단일 책임
+- 자식 Animator 컴포넌트 제거 가능 → 구조 단순화
+- Avatar 자산은 다른 캐릭터에서도 재사용 가능
+
+#### 영향
+- 다른 시스템에 영향없이 동작 결과 동일
+
+#### 안전장치 개선
+- 프리팹에서 처음에 A가 꺼져있을 경우 켜지지 않는 문제 발생.
+- 기존에  ApplyNormalAvatar()으로 노말 아바타로 초기화 하는 함수를 Awake 시점에 호출하여 해결
+
+---
+
+### PlayerAnimation 구현
+
+- **역할**: Animator 파라미터 제어 및 블렌드 트리 연동을 통해 캐릭터의 시각적 움직임(로코모션, 점프 등)을 자연스럽게 표현하는 비주얼 전담 모듈.
+
 - **구현 흐름**:
-- **활용**:
+    - **[해시 캐싱(Awake)]** Animator 파라미터를 `static readonly int Anim___` 패턴으로 클래스 레벨 상수화하여 매 호출 해싱 비용 제거.
+    - **[상태 참조(Update)]** `PlayerMovement`에서 계산된 `CurrentSpeed`, `IsGrounded`, `JustJumped` 등 상태값을 매 프레임 읽어 Animator 파라미터에 동기화.
+    - **[블렌드 트리 연동]** Speed/MotionSpeed 파라미터로 Idle/Walk/Run 블렌드 트리를 자연스럽게 전환.
+    - **[단발성 액션]** `JustJumped` 플래그 감지하여 점프 Bool 갱신.
+    - **[Root Motion 분리]** Animator의 Root Motion 비활성화. 실제 변위는 `CharacterController.Move`가 전담, Animator는 시각적 움직임만 담당.
+
+- **활용**: 물리 이동과 시각 표현이 완벽히 분리되어 애니메이션 클립 교체나 상체 전용 레이어 추가 시 이동 로직 코드 수정 불필요.
+
+#### 설계 결정 사항
+
+**[Update 폴링 방식 선택]**  
+이동 관련 애니메이션 파라미터(Speed, Grounded 등)는 매 프레임 변화하는 연속값이라 이벤트 기반이 부적절. Sprint나 Attack 같은 호출성 이벤트는 이미 이벤트로 통일했지만, 연속값은 Unity 표준 패턴인 Update 폴링이 디버깅 동선도 짧고 효율적. **데이터 성격에 맞춰 처리 방식을 선택**.
+
+**[Animator Layer 구성]**  
+- Layer 0 `Locomotion`: 전신 이동 + 전신 반응 (Hit, Death)
+- Layer 1 `Action`: 상체 전용 (Avatar Mask, Attack 등)
+
+이동 중에도 손 공격이 가능해야 호러 추격 전투 분위기가 살기 때문에 Action Layer 분리. Hit/Death는 전신 정지가 자연스러우므로 Layer 0에서 처리.
+
+**[Trigger는 이벤트 기반]**  
+Attack, Hit, Death 같은 단발성 트리거는 PlayerCombat의 `NetworkVariable<PlayerCombatState>` 변경 시점에 `PlayStateAnimation(state)` 호출 방식으로 처리. 매 프레임 폴링이 아닌 호출 기반.
+
+공격 피격 사망 모션 추가
+믹사모에서 애니메이션 찾기.
 
 ---
 
