@@ -82,12 +82,12 @@ public class AudioManager : MonoBehaviour
     }
 
 
-    public void SetAudioVolume(AudioMixerType audioMixerType, float volume)
+    void SetAudioVolume(AudioMixerType audioMixerType, float volume)
     {
         // 오디오 믹서의 값은 -80 ~ 0까지이기 때문에 0.0001 ~ 1의 Log10 * 20을 한다.
         audioMixer.SetFloat(audioMixerType.ToString(), Mathf.Log10(volume) * 20);
     }
-    public void SetAudioMute(AudioMixerType audioMixerType)
+    void SetAudioMute(AudioMixerType audioMixerType)
     {
         int type = (int)audioMixerType;
         if (!isMute[type]) // 뮤트 
@@ -104,12 +104,12 @@ public class AudioManager : MonoBehaviour
         }
     }
     // 버튼 클릭 이벤트에 연결할 함수들
-    private void Mute()
+    public void Mute()
     {
-        AudioManager.Instance.SetAudioMute(AudioMixerType.BGM);
+        Instance.SetAudioMute(AudioMixerType.BGM);
     }
-    private void ChangeVolume(float volume)
+    public void ChangeVolume(float volume)
     {
-        AudioManager.Instance.SetAudioVolume(AudioMixerType.BGM, volume);
+        Instance.SetAudioVolume(AudioMixerType.BGM, volume);
     }
 }

@@ -33,6 +33,12 @@ public class TEST_NetworkTester : NetworkBehaviour
             if (!IsServer) return;
             BattleManager.Instance.StartGame();
         }
+
+        // DEL키: 네트워크 종료
+        if (Keyboard.current.deleteKey.wasPressedThisFrame)
+        {
+            NetworkManager.Singleton.Shutdown();
+        }
     }
 }
 #endif

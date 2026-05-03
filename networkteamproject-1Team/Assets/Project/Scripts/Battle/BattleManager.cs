@@ -37,7 +37,7 @@ namespace Battle
             // 아직 살아있는 플레이어 제거
             for (int i = tm.activePlayers.Count - 1; i >= 0; i--) tm.activePlayers[i].NetworkObject.Despawn();
 
-            // 재스폰 + 팀 재배정 + GameStart
+            // 재스폰 + 팀 재배정 + StartCountdown
             tm.SpawnAllPlayers();
         }
 
