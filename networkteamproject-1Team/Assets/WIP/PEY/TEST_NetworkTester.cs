@@ -18,27 +18,13 @@ public class TEST_NetworkTester : NetworkBehaviour
         // F1: Host 시작
         if (Keyboard.current.f1Key.wasPressedThisFrame)
         {
-            var nm = NetworkManager.Singleton;
-            if (nm.IsListening || nm.IsClient || nm.IsServer)
-            {
-                Debug.LogWarning("[TEST] 이미 연결 중입니다. 씬을 완전히 정리하고 싶다면 에디터 플레이를 중지해주세요.");
-                return;
-            }
-
-            nm.StartHost();
+            NetworkManager.Singleton.StartHost();
             Debug.Log("[TEST] 호스트 시작");
         }
         // F2: Client 시작
         if (Keyboard.current.f2Key.wasPressedThisFrame)
         {
-            var nm = NetworkManager.Singleton;
-            if (nm.IsListening || nm.IsClient || nm.IsServer)
-            {
-                Debug.LogWarning("[TEST] 이미 연결 중입니다.");
-                return;
-            }
-
-            nm.StartClient();
+            NetworkManager.Singleton.StartClient();
             Debug.Log("[TEST] 클라이언트 시작");
         }
         // F3: 게임 시작 (재시작 겸용)
@@ -46,6 +32,12 @@ public class TEST_NetworkTester : NetworkBehaviour
         {
             if (!IsServer) return;
             BattleManager.Instance.StartGame();
+        }
+
+        // DEL키: 네트워크 종료
+        if (Keyboard.current.deleteKey.wasPressedThisFrame)
+        {
+            NetworkManager.Singleton.Shutdown();
         }
     }
 }

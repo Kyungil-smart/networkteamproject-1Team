@@ -15,27 +15,62 @@ public class TeamManager : NetworkBehaviour
     [SerializeField] Transform[] _spawnPoints;
     [SerializeField, Min(0)] int _startTeamBCount = 1;
 
-    // 서버 기준 스폰된 플레이어 목록 (서버 전용)
-    public List<TeamBase> activePlayers = new();
+    public List<TeamBase> activePlayers = new(); // 스폰된 플레이어 목록 (서버 전용)
+    int _expectedPlayers;
+    int _currentLoadedCount;
+
+    // 팀별 플레이어 목록 조회
+    public List<TeamBase> GetPlayersByTeam(TeamType team)
+        => activePlayers.FindAll(r => r.Team.Value == team);
 
     protected override void OnNetworkPostSpawn()
     {
         if (!IsServer) return;
+        _expectedPlayers = LobbyManager.Instance.ExpectedPlayerCount;
+
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += OnClientLoadedScene;
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SpawnAllPlayers;
     }
 
     public override void OnNetworkDespawn()
     {
         if (!IsServer) return;
-        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SpawnAllPlayers;
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.SceneManager != null)
+        {
+            NetworkManager.Singleton.SceneManager.OnLoadComplete -= OnClientLoadedScene;
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= SpawnAllPlayers;
+        }
     }
 
-    // 팀별 플레이어 목록 조회
-    public List<TeamBase> GetPlayersByTeam(TeamType team)
-        => activePlayers.FindAll(r => r.Team.Value == team);
+    void OnClientLoadedScene(ulong clientId, string sceneName, LoadSceneMode mode)
+    {
+        _currentLoadedCount++;
+        UpdateWaitingUIClientRpc(_currentLoadedCount, _expectedPlayers);
+    }
+
+    [ClientRpc]
+    void UpdateWaitingUIClientRpc(int current, int expected)
+    {
+        if (GameWaitingUI.Instance != null)
+            GameWaitingUI.Instance.UpdateWaitingText(current, expected);
+    }
+    [ClientRpc]
+    void ShowTimeoutClientRpc(int timeoutCount)
+    {
+        if (GameWaitingUI.Instance != null)
+            GameWaitingUI.Instance.ShowTimeoutError(timeoutCount);
+    }
 
     void SpawnAllPlayers(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
+        if (clientsTimedOut != null && clientsTimedOut.Count > 0)
+        {
+            Debug.LogWarning($"[TeamManager] {clientsTimedOut.Count}명 씬 로드 timeout 발생");
+            ShowTimeoutClientRpc(clientsTimedOut.Count);
+            LobbyManager.Instance.ReturnToRoomAsync().Forget();
+            return;
+        }
+
         activePlayers.Clear();
         // 셔플로 팀 배정 결정
         List<ulong> shuffled = new List<ulong>(clientsCompleted);
@@ -83,7 +118,14 @@ public class TeamManager : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void GameStartRpc()
     {
+        HideWaitingUIClientRpc();
         BattleManager.Instance.StartCountdown(activePlayers).Forget();
+    }
+    [ClientRpc]
+    void HideWaitingUIClientRpc()
+    {
+        if (GameWaitingUI.Instance != null)
+            GameWaitingUI.Instance.HideWaitingPanel();
     }
 
     void Shuffle(List<ulong> list)

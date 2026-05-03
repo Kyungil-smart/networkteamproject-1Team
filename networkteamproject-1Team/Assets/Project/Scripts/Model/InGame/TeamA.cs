@@ -25,7 +25,7 @@ public class TeamA : TeamBase
         ApplyNormalAvatar(); 
     }
 
-    protected override void OnTeamSetup(TeamType team) // 팀 배정 시 모든 클라이언트에서 호출됨
+    protected override void OnTeamSetup() // 팀 배정 시 모든 클라이언트에서 호출됨
     {
         // B팀 클라이언트에서 PlayerA를 괴물로 보이게 처리
         // 앞 순서로 생성된 PlayerA 프리팹은 델리게이트로 처리 (플레이어 B 설정이 늦었을때 적용)

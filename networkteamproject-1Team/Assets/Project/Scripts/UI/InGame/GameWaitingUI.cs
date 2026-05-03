@@ -1,79 +1,47 @@
-using System.Collections;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 
 /// <summary>
 /// 게임 씬 진입 후 다른 플레이어 합류를 기다리는 동안 표시되는 오버레이 UI
+/// 서버(TeamManager)가 보내는 ClientRpc를 받아 UI를 통제
 /// </summary>
-public class GameWaitingUI : MonoBehaviour
+public class GameWaitingUI : NetworkBehaviour
 {
-    [SerializeField] private GameObject _panel;
-    [SerializeField] private TMP_Text _statusText;
+    public static GameWaitingUI Instance { get; private set; }
 
-    private bool _isBound;
+    [SerializeField] GameObject _panel;
+    [SerializeField] TMP_Text _statusText;
 
-    private void OnEnable()
+    private void Awake()
     {
-        ShowWaiting();
-        StartCoroutine(BindWhenManagerReady());
+        Instance = this;
     }
 
-    private void OnDisable()
+    protected override void OnNetworkPostSpawn()
     {
-        UnbindSessionManagerEvents();
+        _statusText.text = "플레이어 합류 대기 중...";
     }
 
-    private IEnumerator BindWhenManagerReady()
+    public override void OnDestroy()
     {
-        // NOTE: GameSessionManager는 NetworkBehaviour라 OnNetworkSpawn 이후에 이벤트 구독 가능
-        while (GameSessionManager.Instance == null)
-        {
-            yield return null;
-        }
-        BindSessionManagerEvents();
+        base.OnDestroy();
+        if (Instance == this) Instance = null;
     }
 
-    private void BindSessionManagerEvents()
-    {
-        if (_isBound || GameSessionManager.Instance == null) return;
-        GameSessionManager session = GameSessionManager.Instance;
-        session.OnWaitingStatusChanged += HandleWaitingStatusChanged;
-        session.OnGameStarted += HandleGameStarted;
-        _isBound = true;
-
-        // 구독 전에 이미 NetworkVariable이 값 변경을 완료했을 수 있으므로 현재 상태를 즉시 반영
-        HandleWaitingStatusChanged(session.CurrentJoinedCount, session.ExpectedPlayerCount);
-        if (session.IsGameStarted)
-        {
-            HandleGameStarted();
-        }
-    }
-
-    private void UnbindSessionManagerEvents()
-    {
-        if (!_isBound || GameSessionManager.Instance == null)
-        {
-            _isBound = false;
-            return;
-        }
-        GameSessionManager.Instance.OnWaitingStatusChanged -= HandleWaitingStatusChanged;
-        GameSessionManager.Instance.OnGameStarted -= HandleGameStarted;
-        _isBound = false;
-    }
-
-    private void HandleWaitingStatusChanged(int current, int expected)
+    public void UpdateWaitingText(int current, int expected)
     {
         _statusText.text = $"플레이어 합류 대기 중... ({current}/{expected})";
     }
 
-    private void HandleGameStarted()
+    public void ShowTimeoutError(int timeoutCount)
     {
-        _panel.SetActive(false);
+        _statusText.color = Color.red;
+        _statusText.text = $"씬 로드 Timeout 발생! ({timeoutCount}명)";
     }
 
-    private void ShowWaiting()
+    public void HideWaitingPanel()
     {
-        _panel.SetActive(true);
-        _statusText.text = "플레이어 합류 대기 중...";
+        _panel.SetActive(false);
     }
 }
