@@ -8,8 +8,6 @@ public partial class LocalManager : MonoBehaviour
 {
     public static LocalManager Instance;
 
-    public bool isInGame;
-
     public event Action OnIamBSet;
     bool _iamB;
     public bool IamB
