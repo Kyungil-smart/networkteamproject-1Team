@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 
 public static class AuthService
 {
+    //[RuntimeInitializeOnLoadMethod]
     public static async UniTask InitializeAsync()
     {
         if (UnityServices.State != ServicesInitializationState.Initialized)

@@ -28,8 +28,8 @@ public partial class LocalManager : MonoBehaviour
     {
         if (NetworkManager.Singleton == null) return; // 테스트 씬 오류 방지
 
-        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+        //NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnect;
+        //NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
     }
 
     private void OnClientDisconnect(ulong clientId)

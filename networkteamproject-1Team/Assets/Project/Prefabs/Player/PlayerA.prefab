@@ -55,7 +55,7 @@ Animator:
   m_GameObject: {fileID: 297689902301139574}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 522943fc9652c81498c52791fa1b5057, type: 3}
-  m_Controller: {fileID: 9100000, guid: 72ac6267e1126884d9c0117e30c9da54, type: 2}
+  m_Controller: {fileID: 9100000, guid: b0ec7a4c72e603f499480078320dd354, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -86,7 +86,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 3
   m_Height: 1.75
-  m_Radius: 0.23
+  m_Radius: 0.45
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -112,7 +112,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.23
-  m_Height: 1.85
+  m_Height: 1.75
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!114 &1597624042627408676
@@ -179,6 +179,18 @@ MonoBehaviour:
       NameHash: 1939466105
       Synchronize: 1
       ParameterType: 1
+    - name: Attack
+      NameHash: 1080829965
+      Synchronize: 1
+      ParameterType: 9
+    - name: Hit
+      NameHash: 1654612129
+      Synchronize: 1
+      ParameterType: 9
+    - name: Death
+      NameHash: 646380074
+      Synchronize: 1
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &4442550540336305417
 MonoBehaviour:
@@ -271,6 +283,8 @@ MonoBehaviour:
     m_InternalValue: 0
   _normalModel: {fileID: 6854856384662116856}
   _monsterModel: {fileID: 4990878723907027394}
+  _normalAvatar: {fileID: 0}
+  _monsterAvatar: {fileID: 0}
 --- !u!114 &5409360667865138646
 MonoBehaviour:
   m_ObjectHideFlags: 0
