@@ -285,7 +285,7 @@ public void OnSprint(InputAction.CallbackContext context)
 
 > **추후 폴리싱**: 상하 회전 시 카메라만 회전시키는 현재 방식에 캐릭터 Spine 본을 적정 수치로 IK 보정 추가하면 더 자연스러운 연출 가능 (다른 클라이언트가 봤을 때 위/아래 시선이 표현됨).
 
----
+## Day 7 - 2026-04-30
 
 ### PlayerCamera 보강 — Position Constraint → LateUpdate 직접 추적
 
@@ -318,7 +318,7 @@ Position Constraint 컴포넌트 제거 후 PlayerCamera의 LateUpdate에서 직
 ---
 
 ### TeamA Avatar 교체 방식 개선
-### 배경
+#### 배경
 플레이어 작업 중 팀원의 TeamA 코드에서 책임 분리 측면 개선 여지 발견. 해당 팀원과 협의 후 직접 수정 진행.
 
 #### 기존 방식의 문제
@@ -368,8 +368,45 @@ Position Constraint 컴포넌트 제거 후 PlayerCamera의 LateUpdate에서 직
 **[Trigger는 이벤트 기반]**  
 Attack, Hit, Death 같은 단발성 트리거는 PlayerCombat의 `NetworkVariable<PlayerCombatState>` 변경 시점에 `PlayStateAnimation(state)` 호출 방식으로 처리. 매 프레임 폴링이 아닌 호출 기반.
 
-공격 피격 사망 모션 추가
-믹사모에서 애니메이션 찾기.
+## Day 8 — 2026-05-04
+
+### 플레이어 전투 애니메이션 구현
+
+#### 모션 에셋 준비
+공격(Punching), 피격(Getting Hit), 사망(Dying Backwards) 모션을 Mixamo에서 설정 후 유니티로 임포트.
+
+#### Avatar Mask 결정
+이동하며 공격하는 연출이 필요하므로 상체 마스킹 레이어 필요.
+Avatar Mask는 Humanoid Rig의 본 추상화 기준으로 동작하므로 **A/B 모델 모두에 단일 마스크 적용 가능**. UpperBodyMask 한 개로 처리.
+
+#### Animator Layer 구성
+
+**Base Layer (Layer 0)**
+- 기존 Locomotion 애니메이터를 Sub State Machine으로 정리하여 가독성 확보
+- Dying Backwards (Any State 진입, 복귀 없음 — 사망은 영구 정지)
+
+![alt text](Resources/Base_Layer.png)
+
+**UpperBody Action Layer (Layer 1, Avatar Mask: 상체)**
+- Idle (기본 상태, 마스크가 활성된 상태에서 아무 동작도 적용하지 않음)
+- Punching (공격, Any State 진입 → Idle 복귀)
+- Getting Hit (피격, Any State 진입 → Idle 복귀)
+
+![alt text](Resources/UpperBodyAction_Layer.png)
+
+#### 시행착오 — 피격 위치 변경
+
+초기 설계: Hit/Death 모두 Base Layer (전신 반응)  
+**문제 발견**: 이동 중 피격 시 다리 이동 애니가 끊겨 어색함  
+**조정**: Hit는 UpperBody Layer로 이동 → 이동 중 피격 시 다리 애니 유지하면서 상체만 휘청거림  
+**Death는 Base Layer 유지**: 사망은 전신 정지가 자연스러움
+
+#### 트랜지션 패턴
+- 상체 액션은 모두 **Any State에서 트리거로 진입** → 일관성 확보
+- 액션 종료 후 **마스크가 활성된 상태에서 아무 동작도 적용하지 않은 Idle 상태로 트랜지션** (Layer 1만 비활성 효과)
+- Death는 영구 정지라 복귀 없음
+
+> **설계 결정 이유**: Any State 일괄 진입 패턴은 모든 상태에서 동일한 우선순위로 액션 트리거 가능하게 함. 추후 새 상체 액션(예: 도구 사용) 추가 시에도 같은 패턴으로 확장 가능.
 
 ---
 
