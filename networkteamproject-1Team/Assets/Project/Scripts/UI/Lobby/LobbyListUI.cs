@@ -1,27 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using Unity.Services.Authentication;
 using Unity.Services.Multiplayer;
 using TMPro;
+using Michsky.UI.Dark;
 
 /// <summary>
 /// 로비 씬의 세션 목록 UI + 방 생성/빠른참여/새로고침 컨트롤
 /// </summary>
 public class LobbyListUI : MonoBehaviour
 {
-    [SerializeField] GameObject _lobbyListPanel;
+    [SerializeField] MainPanelManager _darkUIManager;
     [SerializeField] GameObject _roomPanel;
     [SerializeField] Transform _entryContainer;
     [SerializeField] LobbyEntryUI _entryPrefab;
-    [SerializeField] Button _createRoomButton;
-    [SerializeField] Button _quickJoinButton;
-    [SerializeField] Button _joinByCodeButton;
-    [SerializeField] Button _refreshButton;
+    //[SerializeField] Button _createRoomButton;
+    //[SerializeField] Button _quickJoinButton;
+    //[SerializeField] Button _joinByCodeButton;
+    //[SerializeField] Button _refreshButton;
     [SerializeField] TMP_Text _statusText;
-    [SerializeField] TMP_Text _emptyListText;
-    [SerializeField] CreateRoomDialogUI _createRoomDialog;
-    [SerializeField] JoinByCodeDialogUI _joinByCodeDialog;
+    //[SerializeField] TMP_Text _emptyListText;
+    //[SerializeField] CreateRoomDialogUI _createRoomDialog;
+    //[SerializeField] JoinByCodeDialogUI _joinByCodeDialog;
 
     readonly List<LobbyEntryUI> _spawnedEntries = new List<LobbyEntryUI>();
     bool _isBusy;
@@ -38,40 +38,34 @@ public class LobbyListUI : MonoBehaviour
 
     private void Start()
     {
-        ShowLobbyListPanel(LobbyManager.Instance.CurrentSession == null);
-        if (_lobbyListPanel.activeSelf)
-        {
-            RefreshLobbyList();
-        }
+        RefreshLobbyList();
     }
 
     private void BindEvents()
     {
-        BindButtonEvents();
+        //BindButtonEvents();
         BindLobbyManagerEvents();
     }
 
     private void UnbindEvents()
     {
-        UnbindButtonEvents();
+        //UnbindButtonEvents();
         UnbindLobbyManagerEvents();
     }
 
-    private void BindButtonEvents()
-    {
-        _createRoomButton.onClick.AddListener(OnCreateRoomClicked);
-        _quickJoinButton.onClick.AddListener(OnQuickJoinClicked);
-        _joinByCodeButton.onClick.AddListener(OnJoinByCodeClicked);
-        _refreshButton.onClick.AddListener(RefreshLobbyList);
-    }
+    //private void BindButtonEvents()
+    //{
+        //_quickJoinButton.onClick.AddListener(OnQuickJoinClicked);
+        //_joinByCodeButton.onClick.AddListener(OnJoinByCodeClicked);
+        //_refreshButton.onClick.AddListener(RefreshLobbyList);
+    //}
 
-    private void UnbindButtonEvents()
-    {
-        _createRoomButton.onClick.RemoveListener(OnCreateRoomClicked);
-        _quickJoinButton.onClick.RemoveListener(OnQuickJoinClicked);
-        _joinByCodeButton.onClick.RemoveListener(OnJoinByCodeClicked);
-        _refreshButton.onClick.RemoveListener(RefreshLobbyList);
-    }
+    //private void UnbindButtonEvents()
+    //{
+        //_quickJoinButton.onClick.RemoveListener(OnQuickJoinClicked);
+        //_joinByCodeButton.onClick.RemoveListener(OnJoinByCodeClicked);
+        //_refreshButton.onClick.RemoveListener(RefreshLobbyList);
+    //}
 
     private void BindLobbyManagerEvents()
     {
@@ -85,7 +79,7 @@ public class LobbyListUI : MonoBehaviour
         LobbyManager.Instance.OnSessionLeft -= OnSessionLeft;
     }
 
-    private async void RefreshLobbyList()
+    public async void RefreshLobbyList()
     {
         if (_isBusy) return;
         if (!AuthenticationService.Instance.IsSignedIn)
@@ -100,7 +94,6 @@ public class LobbyListUI : MonoBehaviour
         {
             IList<ISessionInfo> sessions = await LobbyManager.Instance.QuerySessionsAsync();
             PopulateEntries(sessions);
-            RefreshEmptyLabel(sessions.Count);
             SetStatus($"방 {sessions.Count}개 조회됨");
         }
         finally
@@ -129,22 +122,11 @@ public class LobbyListUI : MonoBehaviour
         _spawnedEntries.Clear();
     }
 
-    private void RefreshEmptyLabel(int count)
-    {
-        _emptyListText.gameObject.SetActive(count == 0);
-    }
-
-    private void OnCreateRoomClicked()
-    {
-        if (_isBusy) return;
-        _createRoomDialog.Open();
-    }
-
-    private void OnJoinByCodeClicked()
-    {
-        if (_isBusy) return;
-        _joinByCodeDialog.Open();
-    }
+    //private void OnJoinByCodeClicked()
+    //{
+    //    if (_isBusy) return;
+    //    _joinByCodeDialog.Open();
+    //}
 
     private async void OnQuickJoinClicked()
     {
@@ -166,6 +148,8 @@ public class LobbyListUI : MonoBehaviour
     {
         if (_isBusy) return;
         SetBusy(true);
+        LobbyManager.Instance.SetPlayerName(LobbyManager.Instance.GetPlayerName());
+
         SetStatus($"'{sessionInfo.Name}' 참여 중...");
         try
         {
@@ -181,10 +165,10 @@ public class LobbyListUI : MonoBehaviour
     private void SetBusy(bool busy)
     {
         _isBusy = busy;
-        _createRoomButton.interactable = !busy;
-        _quickJoinButton.interactable = !busy;
-        _joinByCodeButton.interactable = !busy;
-        _refreshButton.interactable = !busy;
+        //_createRoomButton.interactable = !busy;
+        //_quickJoinButton.interactable = !busy;
+        //_joinByCodeButton.interactable = !busy;
+        //_refreshButton.interactable = !busy;
         for (int i = 0; i < _spawnedEntries.Count; i++)
         {
             if (_spawnedEntries[i] != null) _spawnedEntries[i].SetInteractable(!busy);
@@ -204,7 +188,8 @@ public class LobbyListUI : MonoBehaviour
 
     private void ShowLobbyListPanel(bool show)
     {
-        _lobbyListPanel.SetActive(show);
+        _darkUIManager.OpenPanel("Multiplayer");
+        //_lobbyListPanel.SetActive(show);
         _roomPanel.SetActive(!show);
     }
 

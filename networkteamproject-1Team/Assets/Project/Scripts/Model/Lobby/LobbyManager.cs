@@ -1,10 +1,11 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using TMPro;
 using Unity.Netcode;
 using Unity.Services.Multiplayer;
-using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 /// <summary>
 /// 세션(Lobby + Relay + NGO 통합) 진입/퇴장과 게임 시작을 총괄하는 싱글톤 매니저.
@@ -15,6 +16,7 @@ public class LobbyManager : MonoBehaviour
     public static LobbyManager Instance { get; private set; }
 
     [SerializeField] LobbySettings _settings;
+    [SerializeField] TMP_InputField _playerNameInput;
 
     // SDK 내부 transient 실패(첫 번째 NetworkManager 시작 task canceled 등) 자동 재시도용
     const int JOIN_MAX_RETRY = 1;
@@ -570,5 +572,11 @@ public class LobbyManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    public string GetPlayerName()
+    {
+        string playerName = _playerNameInput.text;
+        return string.IsNullOrWhiteSpace(playerName) ? $"Player{UnityEngine.Random.Range(100, 1000)}" : playerName;
     }
 }

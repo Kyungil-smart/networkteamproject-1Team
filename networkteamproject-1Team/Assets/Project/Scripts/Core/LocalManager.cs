@@ -37,12 +37,12 @@ public partial class LocalManager : MonoBehaviour
         // 자기 자신이 해제된 경우 = 서버와의 연결이 끊김 = Host 이탈
         if (clientId != NetworkManager.Singleton.LocalClientId)
         {
-            Debug.Log("[LinkManager] 누군가 연결이 해제되었습니다."); //서버만 로그 뜨는 중
+            Debug.Log("[LocalManager] 누군가 연결이 해제되었습니다."); //서버만 로그 뜨는 중
             return;
         }
         else
         {
-            Debug.Log("[LinkManager] 서버와의 연결이 끊겼습니다."); // 자신 또는 서버 연결 해제 시
+            Debug.Log("[LocalManager] 서버와의 연결이 끊겼습니다."); // 자신 또는 서버 연결 해제 시
         }
 
         // TODO: 연결해제 UI 처리
