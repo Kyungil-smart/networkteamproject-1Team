@@ -460,6 +460,69 @@ Avatar Mask는 Humanoid Rig의 본 추상화 기준으로 동작하므로 **A/B 
 
 **해결 — 하이브리드**
 
+### Weapon 영역 수정
+
+#### 발견 흐름
+
+PlayerCombat 작성 후 멀티 인스턴스 테스트 시 호스트는 공격이 정상 동작하지만 다른 클라이언트는 공격 모션만 나가고 실질적 공격(데미지/사운드)이 발생하지 않음.
+
+#### 원인 1 — Owner 한정 Ready 초기화
+
+Weapon 코드 분석:
+Owner만 OnGameStart 구독 → Owner만 Ready() 호출 → Owner의 _state만 Ready로 변경
+
+PlayerCombat이 ServerRpc 안에서 `_weapon.TryAttack()` 호출 → 서버 측 Weapon 인스턴스의 `_state` 확인.
+
+서버 입장에서 본 Weapon `_state`:
+- 호스트의 Weapon: 호스트가 Owner → `_state = Ready` ✅
+- 다른 클라의 Weapon: 서버는 그 Weapon의 Owner가 아니라서 `OnNetworkSpawn`에서 early return → `_state = State.None` ❌
+
+결과:
+- 호스트 클라 공격 요청 → 서버가 호스트 Weapon 인스턴스에서 TryAttack → `_state == Ready` 통과 → 공격 성공
+- 다른 클라 공격 요청 → 서버가 그 클라 Weapon 인스턴스에서 TryAttack → `_state == None` → 차단 → 공격 실패
+
+**해결**: `OnGameStart` 구독을 `IsOwner` 체크 위로 이동 → 모든 인스턴스에서 Ready 처리.
+
+#### 원인 2 — ServerRpc 권한 충돌
+
+`_state` 문제 해결 후 새로운 에러 발생:
+```
+Only the owner can invoke a ServerRpc that requires ownership!
+Battle.Weapon:AttackServerRpc
+```
+기존 Weapon은 Owner가 onAttack 직접 구독 → Owner 측에서 ServerRpc 호출 흐름.
+
+**본인 통합 후 흐름**:
+- Owner 클라 → SubmitAttackServerRpc (PlayerCombat) → 서버  
+- 서버 → _weapon.TryAttack() → AttackServerRpc 호출 시도  
+- 서버는 NetworkObject의 Owner가 아님 → 권한 거부  
+
+#### 해결책 검토
+
+**옵션 A — RequireOwnership = false**
+- AttackServerRpc, BlockedServerRpc에 `RequireOwnership = false` 추가
+- 두 줄 수정으로 즉시 동작
+- 서버가 자기에게 ServerRpc 보내는 형태가 되어 의미 약화
+- 클라 위조 가능성 (PlayerCombat이 게이트키퍼라 사실상 안전하지만)
+
+**옵션 B — 서버 직접 처리 구조로 재구성** (선택)
+- ServerRpc 제거, 서버 측 메서드 + ClientRpc 구조
+- 권한 흐름 명료: 서버 권한 = 서버 처리, ServerRpc는 클라→서버 호출 전용
+- 네트워크 메시지 1회 절감
+
+옵션 A로 동작 확인 후 옵션 B로 재구성. 팀원 영역 큰 변경이라 사전 합의 후 직접 정리 및 수정.
+
+#### 옵션 B 구현 변경 사항
+
+- `AttackServerRpc` 제거 → `AttackOnServer` 서버 직접 메서드
+- `BlockedServerRpc` 제거 → `BlockedClientRpc` 서버에서 직접 호출
+- Miss 사운드를 `BroadcastMissClientRpc`로 모든 클라 동기화
+- `TryAttack`에 `if (!IsServer) return` 가드 추가
+- `OnGameStart` 구독 IsOwner 위로 이동 (원인 1 해결 통합)
+
+> **시행착오 가치**: ServerRpc 권한 모델 + Owner-only 초기화 패턴이 서버 권한 통합 설계와 충돌하는 실전 케이스. 옵션 A(우회) vs 옵션 B(구조 정리) 비교를 통해 "동작 우선"과 "권한 모델 명료성"의 트레이드오프 학습.
+
+
 ---
 
 ---
