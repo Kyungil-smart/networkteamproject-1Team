@@ -1,5 +1,4 @@
 using Battle;
-using System;
 using UnityEngine;
 
 // PlayerB 프리팹에 부착
@@ -23,14 +22,14 @@ public class TeamB : TeamBase
     {
         nameText.text = newName;
 
-        // 내가B면 TeamB 컴포넌트 부착된 대상을 볼 때 빨간색으로 이름표시(서로 알수 있게)
+        // 내가B면 A팀(괴물)을 빨간색으로, B팀(사람)을 흰색으로 표시
         if (LocalManager.Instance.IamB)
         {
-            nameText.color = Color.red;
+            nameText.color = Color.white;
         }
         else
         {
-            nameText.color = Color.white; // 그 외엔 기본 색상
+            nameText.color = Color.red;
         }
     }
 }
