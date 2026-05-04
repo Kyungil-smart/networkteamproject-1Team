@@ -20,8 +20,8 @@ namespace Player
         
         // 하위로 입력을 받는 모듈 선언
         private PlayerMovement _movement;
-        // 상호작용
         // 전투
+        // 상호작용
         // 카메라 관련 입력 추가시 생성
         // private PlayerCamera _camera;
         
@@ -41,6 +41,7 @@ namespace Player
             _input.onMove          += OnMove;
             _input.onJump          += OnJump; 
             _input.onSprintChanged += OnSprintChanged;
+            // _input.onAttack        -= OnAttack;
         }
         
         // 이동 관련 이벤트 할당 해제(메모리 누수 방지)
@@ -51,7 +52,6 @@ namespace Player
             _input.onMove          -= OnMove;
             _input.onJump          -= OnJump;
             _input.onSprintChanged -= OnSprintChanged;
-            
             // _input.onAttack        -= OnAttack;
             // _input.onStartInteract    -= OnInteractStart;
             // _input.onCanceledInteract -= OnInteractCancel;
@@ -61,7 +61,6 @@ namespace Player
         private void OnMove(Vector2 v) => _movement?.SetMoveInput(v);
         private void OnJump() => _movement?.RequestJump();
         private void OnSprintChanged(bool b) => _movement?.SetSprint(b);
-        
         // private void OnAttack() => _combat?.RequestAttack();
         // private void OnInteractStart() => _interactor?.OnInteractStart();
         // private void OnInteractCancel() => _interactor?.OnInteractCancel();

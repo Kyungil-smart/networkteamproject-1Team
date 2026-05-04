@@ -39,13 +39,11 @@ namespace Battle
             if (!IsOwner) return;
             
             input.Enable();
-            input.onAttack += TryAttack;
             BattleManager.Instance.OnGameStart += Ready;
         }
         public override void OnNetworkDespawn()
         {
             if (!IsOwner) return;
-            input.onAttack -= TryAttack;
             BattleManager.Instance.OnGameStart -= Ready;
         }
 
@@ -58,7 +56,7 @@ namespace Battle
                 Attack();
             }
         }
-        void Attack()
+        public void Attack()
         {
             // 아무것도 못 맞춤: Miss
             if (!Physics.Raycast(_attackPoint.position, transform.forward, out RaycastHit hit, weaponSO.range))
