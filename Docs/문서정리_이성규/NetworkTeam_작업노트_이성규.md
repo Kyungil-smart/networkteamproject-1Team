@@ -368,7 +368,7 @@ Position Constraint 컴포넌트 제거 후 PlayerCamera의 LateUpdate에서 직
 **[Trigger는 이벤트 기반]**  
 Attack, Hit, Death 같은 단발성 트리거는 PlayerCombat의 `NetworkVariable<PlayerCombatState>` 변경 시점에 `PlayStateAnimation(state)` 호출 방식으로 처리. 매 프레임 폴링이 아닌 호출 기반.
 
-## Day 8 — 2026-05-04
+## Day 8 — 2026-05-04 (Week 2 Day 1)
 
 ### 플레이어 전투 애니메이션 구현
 
@@ -396,17 +396,69 @@ Avatar Mask는 Humanoid Rig의 본 추상화 기준으로 동작하므로 **A/B 
 
 #### 시행착오 — 피격 위치 변경
 
-초기 설계: Hit/Death 모두 Base Layer (전신 반응)  
-**문제 발견**: 이동 중 피격 시 다리 이동 애니가 끊겨 어색함  
-**조정**: Hit는 UpperBody Layer로 이동 → 이동 중 피격 시 다리 애니 유지하면서 상체만 휘청거림  
+초기 설계: Hit/Death 모두 Base Layer (전신 반응)
+**문제 발견**: 이동 중 피격 시 다리 이동 애니가 끊겨 어색함
+**조정**: Hit는 UpperBody Layer로 이동 → 이동 중 피격 시 다리 애니 유지하면서 상체만 휘청거림
 **Death는 Base Layer 유지**: 사망은 전신 정지가 자연스러움
 
 #### 트랜지션 패턴
 - 상체 액션은 모두 **Any State에서 트리거로 진입** → 일관성 확보
-- 액션 종료 후 **마스크가 활성된 상태에서 아무 동작도 적용하지 않은 Idle 상태로 트랜지션** (Layer 1만 비활성 효과)
+- 액션 종료 후 마스크가 활성된 상태에서 아무 동작도 적용하지 않은 Idle 상태로 트랜지션 (Layer 1만 비활성 효과)
 - Death는 영구 정지라 복귀 없음
 
 > **설계 결정 이유**: Any State 일괄 진입 패턴은 모든 상태에서 동일한 우선순위로 액션 트리거 가능하게 함. 추후 새 상체 액션(예: 도구 사용) 추가 시에도 같은 패턴으로 확장 가능.
+
+#### 시행착오 — 마우스 연타 시 모션 끊김
+
+연타 시 Punching 재생 도중 다시 처음부터 재생되는 현상 발견.
+
+**원인**: Action Layer의 Any State → Punching 트랜지션에서 "Can Transition To Self"가 활성 → Punching 재생 중에 트리거 다시 들어오면 자기 자신으로 또 진입.
+
+**해결**: "Can Transition To Self" 체크 해제. 코드 측에서도 NetworkVariable 동기화 지연 흡수 위해 RequestAttack에서 Weapon.IsReady 사전 체크.
+
+---
+
+### PlayerCombat 스크립트 작성
+
+#### 책임 분리
+- **PlayerCombat**: 상태 관리 / 애니메이션 호출 트리거 / 입력 차단 게이트
+- **Weapon (팀원)**: 실제 공격 판정 / 데미지 전파 / 사운드
+- **PlayerEntity (팀원)**: HP NetworkVariable / IDamageable 구현 / 사망 처리
+- **PlayerAnimation**: 상태 받아 애니 트리거
+
+이 책임 분리로 본인 코드는 **상태 결정만** 하면 되고, 판정/HP는 팀원 영역 활용.
+
+#### 팀원 코드 통합
+- **Weapon**: 팀원과 합의 후 onAttack 직접 구독 제거. PlayerCombat이 상태 체크 후 `_weapon.TryAttack()` 호출하는 구조로 변경. Weapon에 `IsReady` 프로퍼티 public 추가 (사전 체크용).
+- **PlayerEntity**: 별도 PlayerHealth 만들지 않고 `_playerEntity.CurHp.OnValueChanged`와 `onDeath` 이벤트 구독으로 Hit/Dead 상태 전이 트리거.
+
+#### PlayerCombatState Enum
+- Normal / Attacking / Hit / Dead
+- **Stunned 상태 제거** — 호러 게임 추격 분위기 위해 피격 시 입력 차단하지 않음. Hit는 애니메이션 표현 상태일 뿐, 이동/CanMove는 그대로 자유.
+
+#### 행동 게이트
+- `CanAct = (state == Normal)` — 새 공격은 Normal에서만
+- `CanMove = (state != Dead)` — 사망 외엔 항상 이동 가능 (Attacking/Hit 중에도)
+
+#### 권한 모델 — 클라 요청, 서버 승인
+- Owner 클라에서 사전 검증 후 ServerRpc로 요청
+- 서버가 상태 검증 + NetworkVariable 변경 + Weapon 호출
+- 모든 클라는 NetworkVariable.OnValueChanged로 자동 동기화 → PlayerAnimation 트리거
+
+#### Animation Event + UniTask 백업 하이브리드
+
+상태 복귀 방식 선택:
+
+**Animation Event 방식의 장점**
+- 모션 끝 시점 = 상태 종료 시점 (정확히 일치)
+- 모션 길이 변경 시 코드 수정 불필요
+- UniTask Delay + 취소 토큰 처리 단순
+
+**한계 — 이벤트 누락 케이스**
+- 다른 트리거로 애니 도중 다른 State 전이 시 끝 이벤트 발생 안 함
+- 상태가 Attacking에 영원히 머무를 위험
+
+**해결 — 하이브리드**
 
 ---
 
