@@ -3532,6 +3532,7 @@ GameObject:
   - component: {fileID: 2969320409053752293}
   - component: {fileID: 6360620978157909679}
   - component: {fileID: 5394929150763672974}
+  - component: {fileID: 4870485852589985104}
   - component: {fileID: 6907663841478801182}
   m_Layer: 6
   m_Name: Player_Proto_A
@@ -3620,7 +3621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2434627413
+  GlobalObjectIdHash: 605714047
   InScenePlacedSourceGlobalObjectIdHash: 4046959855
   DeferredDespawnTick: 0
   Ownership: 1
@@ -3649,14 +3650,7 @@ MonoBehaviour:
   NetworkAnimatorExpanded: 0
   AuthorityMode: 1
   m_Animator: {fileID: 1472724176898384439}
-  TransitionStateInfoList:
-  - IsCrossFadeExit: 0
-    Layer: 1
-    OriginatingState: 2081823275
-    DestinationState: -217830139
-    TransitionDuration: 0.25
-    TriggerNameHash: 1080829965
-    TransitionIndex: 0
+  TransitionStateInfoList: []
   AnimatorParameterEntries:
     ParameterEntries:
     - name: Speed
@@ -3908,6 +3902,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4983a0f3794b2ab4ba1da1eff7f54507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerAnimation
+--- !u!114 &4870485852589985104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6184062823718913633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25bac654594c50a4883a73760bd4f660, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
+  ShowTopMostFoldoutHeaderGroup: 1
+  _attackMaxDuration: 1
+  _hitMaxDuration: 0.8
 --- !u!114 &6907663841478801182
 MonoBehaviour:
   m_ObjectHideFlags: 0

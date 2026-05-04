@@ -3532,6 +3532,7 @@ GameObject:
   - component: {fileID: 2969320409053752293}
   - component: {fileID: 6360620978157909679}
   - component: {fileID: 5394929150763672974}
+  - component: {fileID: 6456544674719540424}
   - component: {fileID: 6907663841478801182}
   m_Layer: 6
   m_Name: Player_Proto_B
@@ -3897,6 +3898,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4983a0f3794b2ab4ba1da1eff7f54507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerAnimation
+--- !u!114 &6456544674719540424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6184062823718913633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25bac654594c50a4883a73760bd4f660, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
+  ShowTopMostFoldoutHeaderGroup: 1
+  _attackRecoveryDelay: 0.5
+  _stunDuration: 0.3
 --- !u!114 &6907663841478801182
 MonoBehaviour:
   m_ObjectHideFlags: 0
