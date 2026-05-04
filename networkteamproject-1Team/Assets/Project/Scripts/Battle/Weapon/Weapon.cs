@@ -48,14 +48,17 @@ namespace Battle
         }
 
         void Ready() => _state = State.Ready;
+
+        public bool IsReady => _state == State.Ready
+                               && Time.time >= _lastAttackTime + weaponSO.cooltime;
         public void TryAttack()
         {
-            if (_state == State.Ready && Time.time >= _lastAttackTime + weaponSO.cooltime)
-            {
-                _lastAttackTime = Time.time;
-                Attack();
-            }
+            if (!IsReady) return;
+    
+            _lastAttackTime = Time.time;
+            Attack();
         }
+        
         public void Attack()
         {
             // 아무것도 못 맞춤: Miss
