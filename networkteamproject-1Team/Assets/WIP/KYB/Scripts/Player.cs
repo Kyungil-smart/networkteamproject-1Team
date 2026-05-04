@@ -11,7 +11,7 @@ namespace KYB
         public BattleInputReader input;
 
         private PlayerInput _playerInput;
-        private Rigidbody _rb;
+        public Rigidbody _rb;
         private Vector2 _input;
         public Camera cam;
 
@@ -90,7 +90,7 @@ namespace KYB
         /// 상호작용이 가능한 오브젝트를 return 해주는 메서드
         /// </summary>
         /// <returns>상호작용이 가능한 오브젝트</returns>
-        public IInteractable InteractiveObject()
+        private IInteractable InteractiveObject()
         {
             if (cam == null)
             {

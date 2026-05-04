@@ -1,7 +1,6 @@
 using System;
 using Unity.Netcode;
 using UnityEngine;
-using Unity.Netcode;
 
 public class Generator : NetworkBehaviour, IInteractable
 {
@@ -16,7 +15,7 @@ public class Generator : NetworkBehaviour, IInteractable
 
         if (IsServer)
         {
-            _pressAction.OnPressCompleted += ChangeToCompletedMaterialClientRpc; 
+            _pressAction.IsPressAction += ChangeToCompletedMaterialClientRpc; 
         }
     }
     
@@ -26,6 +25,11 @@ public class Generator : NetworkBehaviour, IInteractable
     [ClientRpc]
     private void ChangeToCompletedMaterialClientRpc()
     {
+        if (_renderer.material == completedMaterials)
+        {
+            return;
+        }
+        
         _renderer.material = completedMaterials;
         
         _pressAction.image.canvas.gameObject.SetActive(false);

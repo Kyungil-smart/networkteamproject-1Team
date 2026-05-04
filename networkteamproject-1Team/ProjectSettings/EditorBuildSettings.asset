@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Project/Scenes/TitleWIP.unity
     guid: ac17c2b92179fb24692ad772668272e0
+  - enabled: 1
+    path: Assets/WIP/KYB/Scenes/Show.unity
+    guid: aae472d23aef9d44a9abc3e9136cef36
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: a986ca7082d39504f89279fc1d242f7d, type: 3}
   m_UseUCBPForAssetBundles: 0
