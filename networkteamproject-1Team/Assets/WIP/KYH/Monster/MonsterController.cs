@@ -86,21 +86,29 @@ public class MonsterController : NetworkBehaviour
 
     public Transform DetectPlayer()
     {
-        Collider[] colliders = Physics.OverlapSphere(transform.position + MonsterData.offset, MonsterData.chaseRange, _layerMask);
-
+        Collider[] colliders = Physics.OverlapSphere(transform.position + MonsterData.offset, MonsterData.chaseRange);
+        
         Transform target = null;
         float minDistance = MonsterData.chaseRange;
         
         foreach (Collider col in colliders)
         {
+            col.TryGetComponent(out TeamA playerA);
+            if (playerA == null)
+            {
+                continue;
+            }
+            
             float dis = Vector3.Distance(transform.position, col.transform.position);
-
+            
             if (dis < minDistance)
             {
                 minDistance = dis;
                 target = col.transform;
             }
+
         }
+
         return target;
     }
 
