@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using WIP.KYB.Scripts;
 
 // [게임 상태]
 public enum GameState
@@ -42,7 +43,7 @@ public class PlayerInfo
     }
 }
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     // ---------------------------------
     // [싱글톤 패턴]
@@ -63,6 +64,12 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);  // 씬 변경에도 파괴 안되게 하기
     }
+
+    public override void OnNetworkSpawn()
+    {
+        RandomSpawnObject.Instance.SpawnObjects(10);
+    }
+
 
     // [현재 게임 상태]
     public GameState CurrentState { get; private set; } = GameState.Lobby;

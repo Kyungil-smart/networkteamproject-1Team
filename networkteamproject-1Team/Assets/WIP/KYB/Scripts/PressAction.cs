@@ -10,7 +10,7 @@ public class PressAction : NetworkBehaviour
     
     public Action OnPressStart;
     public Action OnPressCanceled;
-    public Action OnPressCompleted;
+    public Action IsPressAction;
     
     private Coroutine _coroutine;
     
@@ -62,7 +62,7 @@ public class PressAction : NetworkBehaviour
     {
         if (_isPressClear.Value)
         {
-            OnPressCompleted?.Invoke();
+            IsPressAction?.Invoke();
             return;
         }
         
@@ -101,7 +101,7 @@ public class PressAction : NetworkBehaviour
 
         if (!_isPressClear.Value)
         {
-            OnPressCompleted?.Invoke();
+            IsPressAction?.Invoke();
         }
         
         _isPressClear.Value = true;

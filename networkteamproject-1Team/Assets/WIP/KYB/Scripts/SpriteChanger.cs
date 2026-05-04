@@ -14,7 +14,7 @@ public class SpriteChanger : MonoBehaviour
     {
         image.sprite = _sprite;
         
-        _pressAction.OnPressCompleted += OnPressCompleted;
+        _pressAction.IsPressAction += OnPressCompleted;
     }
 
     private void OnPressCompleted()

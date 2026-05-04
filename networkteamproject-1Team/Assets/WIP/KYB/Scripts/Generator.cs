@@ -1,7 +1,6 @@
 using System;
 using Unity.Netcode;
 using UnityEngine;
-using Unity.Netcode;
 
 public class Generator : NetworkBehaviour, IInteractable
 {
@@ -16,7 +15,7 @@ public class Generator : NetworkBehaviour, IInteractable
 
         if (IsServer)
         {
-            _pressAction.OnPressCompleted += ChangeToCompletedMaterialClientRpc; 
+            _pressAction.IsPressAction += ChangeToCompletedMaterialClientRpc; 
         }
     }
     
