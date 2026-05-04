@@ -522,6 +522,15 @@ Battle.Weapon:AttackServerRpc
 
 > **시행착오 가치**: ServerRpc 권한 모델 + Owner-only 초기화 패턴이 서버 권한 통합 설계와 충돌하는 실전 케이스. 옵션 A(우회) vs 옵션 B(구조 정리) 비교를 통해 "동작 우선"과 "권한 모델 명료성"의 트레이드오프 학습.
 
+### 사본 → 공용 영역 통합
+
+본인 사본 환경(`Assets/WIP/LSG/`)에서 작업 진행하던 Player Proto 프리팹과 NetworkPrefabsList 항목을 공용 영역으로 이동:
+
+- `Player_Proto.prefab` → `Assets/Project/Prefabs/Player/` 영역
+- 네트워크 프리팹 등록 → 공용 DB 폴더
+
+명명 정비 후 이동하여 다른 팀원이 동일 프리팹 사용 가능.  
+기존 공용 폴더 Player 프리팹과의 통합/대체 협의는 추후 진행.
 
 ---
 

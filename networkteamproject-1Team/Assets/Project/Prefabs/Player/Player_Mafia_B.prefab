@@ -3526,16 +3526,16 @@ GameObject:
   - component: {fileID: 5158639744957943204}
   - component: {fileID: 8384642681592394265}
   - component: {fileID: 7845125661331331448}
-  - component: {fileID: 5657637999782056080}
+  - component: {fileID: -2179020079024452829}
   - component: {fileID: 2171950331504567429}
   - component: {fileID: 520141695906786605}
   - component: {fileID: 2969320409053752293}
   - component: {fileID: 6360620978157909679}
   - component: {fileID: 5394929150763672974}
-  - component: {fileID: 4870485852589985104}
+  - component: {fileID: 6456544674719540424}
   - component: {fileID: 6907663841478801182}
   m_Layer: 6
-  m_Name: Player_Proto_A
+  m_Name: Player_Mafia_B
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3571,7 +3571,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6184062823718913633}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 522943fc9652c81498c52791fa1b5057, type: 3}
+  m_Avatar: {fileID: 9000000, guid: f2b132adab8f2ee448795f96cc8180cc, type: 3}
   m_Controller: {fileID: 9100000, guid: b0ec7a4c72e603f499480078320dd354, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
@@ -3621,7 +3621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2434627413
+  GlobalObjectIdHash: 668145775
   InScenePlacedSourceGlobalObjectIdHash: 4046959855
   DeferredDespawnTick: 0
   Ownership: 1
@@ -3767,7 +3767,7 @@ MonoBehaviour:
   weaponSO: {fileID: 11400000, guid: d51451bbbc2eea04a80dd4cd76aef8a5, type: 2}
   _attackPoint: {fileID: 7271157951792505123}
   input: {fileID: 11400000, guid: f3dea7d9139022049872a40ab03fa674, type: 2}
---- !u!114 &5657637999782056080
+--- !u!114 &-2179020079024452829
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3776,9 +3776,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6184062823718913633}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3744d5123bb92f4497db9af5151fd47, type: 3}
+  m_Script: {fileID: 11500000, guid: 070222c0c78b75e449feb254d8212d7d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TeamA
+  m_EditorClassIdentifier: Assembly-CSharp::TeamB
   ShowTopMostFoldoutHeaderGroup: 1
   Team:
     UpdateTraits:
@@ -3824,10 +3824,6 @@ MonoBehaviour:
         byte0028: 0
         byte0029: 0
   nameText: {fileID: 6896144108512243135}
-  _normalModel: {fileID: 6790813245457356444}
-  _monsterModel: {fileID: 6742135036820130305}
-  _normalAvatar: {fileID: 9000000, guid: 522943fc9652c81498c52791fa1b5057, type: 3}
-  _monsterAvatar: {fileID: 9000000, guid: f2b132adab8f2ee448795f96cc8180cc, type: 3}
 --- !u!114 &2171950331504567429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3902,7 +3898,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4983a0f3794b2ab4ba1da1eff7f54507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerAnimation
---- !u!114 &4870485852589985104
+--- !u!114 &6456544674719540424
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4107,7 +4103,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5316111650263479106
 Transform:
   m_ObjectHideFlags: 0
@@ -4141,7 +4137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1075321386617030663
 Transform:
   m_ObjectHideFlags: 0
