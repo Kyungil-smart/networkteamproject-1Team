@@ -1,7 +1,6 @@
 using System;
 using Unity.Netcode;
 using UnityEngine;
-using Unity.Netcode;
 
 public class Generator : NetworkBehaviour, IInteractable
 {
