@@ -1325,6 +1325,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6854382151281232354, guid: a8df2b642674935458578e103b8fa4d4, type: 3}
+      propertyPath: NetworkConfig.Prefabs.NetworkPrefabsLists.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6854382151281232354, guid: a8df2b642674935458578e103b8fa4d4, type: 3}
+      propertyPath: 'NetworkConfig.Prefabs.NetworkPrefabsLists.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d9ffe8d2294d604a91e833ccdde871c, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1535,8 +1543,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4700cf58f60e6af4ab0b08365b051ab5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleUI
-  _playerNameInput: {fileID: 1509097894}
-  _enterLobbyButton: {fileID: 1719637155}
   _statusText: {fileID: 1969428431}
 --- !u!114 &1860068219
 MonoBehaviour:

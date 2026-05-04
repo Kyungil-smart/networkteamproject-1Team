@@ -47,7 +47,7 @@ public abstract class TeamBase : NetworkBehaviour
     {
         UpdateNameText(current.ToString());
     }
-    protected virtual void UpdateNameText(string newName) // B끼리는 빨간색으로 보이게 할거라 virtual
+    protected virtual void UpdateNameText(string newName)
     {
         nameText.text = newName;
     }
