@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 public enum GameState
@@ -9,7 +10,7 @@ public enum GameState
     GameOver    // 게임 종료 (게임 결과 화면)
 }
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     // ---------------------------------
     // [싱글톤 패턴]

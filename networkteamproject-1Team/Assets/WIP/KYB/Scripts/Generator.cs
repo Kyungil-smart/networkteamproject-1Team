@@ -16,7 +16,7 @@ public class Generator : NetworkBehaviour, IInteractable
 
         if (IsServer)
         {
-            _pressAction.OnPressCompleted += ChangeToCompletedMaterialClientRpc; 
+            _pressAction.IsPressAction += ChangeToCompletedMaterialClientRpc; 
         }
     }
     
