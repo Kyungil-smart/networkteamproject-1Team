@@ -1,15 +1,49 @@
 using System;
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
+using WIP.KYB.Scripts;
 
+// [게임 상태]
 public enum GameState
 {
-    Waiting,    // 플레이어 접속 대기
-    Playing,    // 게임 진행 중
-    GameOver    // 게임 종료 (게임 결과 화면)
+    Lobby,          // 플레이어 접속 대기
+    GroupAssign,    // A/B 그룹 랜덤 배정
+    Playing,        // 게임 진행 중
+    GameOver        // 게임 종료 (게임 결과 화면)
 }
 
-public class GameManager : MonoBehaviour
+// [플레이어 그룹 구분]
+public enum PlayerGroup
+{
+    None,       // 미배정(초기 상태)
+    Killer,     // 킬러 (1명)
+    Survivor    // 생존자 (3~4명)
+}
+
+// [플레이어 정보 컨테이너]
+[System.Serializable]
+public class PlayerInfo
+{
+    public string playerId;             // 네트워크 플레이어 ID
+    public string playerName;           // 표시 이름
+    public PlayerGroup playerGroup;     // 배정된 그룹
+    public int hitStack;                // 현재 피격 스택 (최대 2)
+    public bool isDead;                 // 사망 여부
+    public bool isEscaped;              // 탈출 성공 여부
+
+    public PlayerInfo(string id, string name)
+    {
+        playerId = id;
+        playerName = name;
+        playerGroup = PlayerGroup.None;
+        hitStack = 0;
+        isDead = false;
+        isEscaped = false;
+    }
+}
+
+public class GameManager : NetworkBehaviour
 {
     // ---------------------------------
     // [싱글톤 패턴]
@@ -20,26 +54,43 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) Destroy(gameObject);
-        return;
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            
+            return;
+        }
 
         Instance = this;
         DontDestroyOnLoad(gameObject);  // 씬 변경에도 파괴 안되게 하기
     }
 
+    public override void OnNetworkSpawn()
+    {
+        RandomSpawnObject.Instance.SpawnObjects(10);
+    }
+
+
     // [현재 게임 상태]
-    public GameState CurrentState { get; private set; } = GameState.Waiting;
+    public GameState CurrentState { get; private set; } = GameState.Lobby;
 
     // [이벤트 시스템]
     // 다른 매니저들이 구독해서 상태 변화 알게 해주기
     // 예) UIManager가 OnGameStarted에 구독 -> 게임 시작 시 HUD 표시
-    public event System.Action OnGameStarted;
-    public event System.Action<bool> OnGameOver; // bool: true = 생존자 승, false = 킬러 승
+    public event System.Action OnLobbyUpdate;               // 로비 플레이어 목록 변경
+    public event System.Action OnGroupAssigned;             // 팀 A/B 배정 완료
+    public event System.Action OnGameStarted;               // 게임 시작   
+    public event System.Action<float> OnTimerUpdated;       // 타이머 갱신 (남은 초)
+    public event System.Action OnTimeExpired;               // 시간 초과 -> 강력 몬스터
+    // public event System.Action<PlayerInfo> OnPlayerHit;     // 플레이어 피격
+    // public event System.Action<PlayerInfo> OnPlayerDead;    // 플레이어 사망
+    public event System.Action<int, int> OnMissionUpdated;  // 미션 진행 (완료수, 전체수)
+    public event System.Action<bool> OnGameOver;            // bool: true = 생존자 승, false = 킬러 승
     
     // [게임 설정값]
     // 인스펙터에서 확인 가능하게 하기
     [Header("게임 설정")] 
-    [SerializeField] private int totalSurvivors = 4;      // 생존자 수
+    [SerializeField] private int totalSurvivors = 3;      // 생존자 수
     [SerializeField] private int generatorsRequired = 5;  // 필요한 발전기 수
     [SerializeField] private float gameStartDelay = 3f;   // 게임 시작 전 카운트 다운
     
@@ -53,7 +104,7 @@ public class GameManager : MonoBehaviour
     // 로비 씬에서 "게임 시작" 버튼을 누르면 해당 함수 호출
     public void StartGame()
     {
-        if (CurrentState != GameState.Waiting) return; // 중복 호출 방지
+        if (CurrentState != GameState.Lobby) return; // 중복 호출 방지
 
         StartCoroutine(GameStartSequence());
     }
@@ -72,7 +123,7 @@ public class GameManager : MonoBehaviour
         escapedSurvivors = 0;
         
         // 상태를 Playing으로 전환
-        ChangeState(GameState.Waiting);
+        ChangeState(GameState.Lobby);
         
         // 등록된 모든 시스템에게 "게임 시작!" 알림
         // PlayerManager, UIManager 등이 이 신호를 받아서 각자 초기화 함
@@ -173,7 +224,7 @@ public class GameManager : MonoBehaviour
     // GameOver 화면에서 "다시하기" 버튼이 이 함수를 호출
     public void RestartGame()
     {
-        ChangeState(GameState.Waiting);
+        ChangeState(GameState.Lobby);
         // TODO: SceneManager.LoadScene("GameScene"); 으로 씬 리로드
     }
     
