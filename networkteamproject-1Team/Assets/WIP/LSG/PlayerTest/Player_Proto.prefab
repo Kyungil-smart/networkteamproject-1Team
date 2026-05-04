@@ -3585,7 +3585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 605714047
+  GlobalObjectIdHash: 2434627413
   InScenePlacedSourceGlobalObjectIdHash: 4046959855
   DeferredDespawnTick: 0
   Ownership: 1
@@ -3804,6 +3804,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f805a3a699f67894f9c026f345524ce2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AcPlayerSound
+  _footStep: {fileID: 0}
 --- !u!1 &6240414296530918941
 GameObject:
   m_ObjectHideFlags: 0
