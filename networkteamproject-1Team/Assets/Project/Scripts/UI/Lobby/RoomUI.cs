@@ -11,10 +11,10 @@ public class RoomUI : MonoBehaviour
 {
     [SerializeField] LobbySettings _settings;
     [SerializeField] TMP_Text _roomNameText;
-    [SerializeField] TMP_Text _lobbyCodeText;
+    [SerializeField] TMP_Text[] _lobbyCodeTexts;
     [SerializeField] List<RoomPlayerSlotUI> _playerSlots = new List<RoomPlayerSlotUI>();
     [SerializeField] Button _readyButton;
-    [SerializeField] TMP_Text _readyButtonLabel;
+    [SerializeField] TMP_Text[] _readyButtonLabels;
     [SerializeField] Button _leaveButton;
     [SerializeField] TMP_Text _statusText;
 
@@ -25,10 +25,6 @@ public class RoomUI : MonoBehaviour
     {
         BindEvents();
         ResetInteractables();
-        if (LobbyManager.Instance.CurrentSession != null)
-        {
-            Refresh(LobbyManager.Instance.CurrentSession);
-        }
     }
 
     private void OnDisable()
@@ -87,7 +83,10 @@ public class RoomUI : MonoBehaviour
     {
         if (session == null) return;
         _roomNameText.text = session.Name;
-        _lobbyCodeText.text = $"Join Code: {session.Code}";
+        for (int i = 0; i < _lobbyCodeTexts.Length; i++)
+        {
+            _lobbyCodeTexts[i].text = $"Join Code: {session.Code}";
+        }
         RefreshPlayerSlots(session);
         RefreshReadyButton();
         RefreshStatusText(session);
@@ -132,9 +131,11 @@ public class RoomUI : MonoBehaviour
     {
         bool isHost = LobbyManager.Instance.IsHost;
 
-        _readyButtonLabel.text = isHost
-            ? "게임 시작"
-            : (_isLocalPlayerReady ? "레디 취소" : "레디");
+        for (int i = 0; i < _readyButtonLabels.Length; i++)
+        {
+            _readyButtonLabels[i].text = isHost
+                ? "START" : (_isLocalPlayerReady ? "CANCEL" : "READY");
+        }
 
         if (!_isProcessingReady)
         {
@@ -209,7 +210,7 @@ public class RoomUI : MonoBehaviour
         }
     }
 
-    private async void OnLeaveClicked()
+    public async void OnLeaveClicked()
     {
         _leaveButton.interactable = false;
         await LobbyManager.Instance.LeaveSessionAsync();

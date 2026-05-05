@@ -10,18 +10,16 @@ using Michsky.UI.Dark;
 /// </summary>
 public class LobbyListUI : MonoBehaviour
 {
-    [SerializeField] MainPanelManager _darkUIManager;
-    [SerializeField] GameObject _roomPanel;
+    [SerializeField] MainPanelManager _darkUIPanelMain;
+    [SerializeField] MainPanelManager _darkUIPanelMulti;
     [SerializeField] Transform _entryContainer;
     [SerializeField] LobbyEntryUI _entryPrefab;
-    //[SerializeField] Button _createRoomButton;
     //[SerializeField] Button _quickJoinButton;
     //[SerializeField] Button _joinByCodeButton;
-    //[SerializeField] Button _refreshButton;
     [SerializeField] TMP_Text _statusText;
     //[SerializeField] TMP_Text _emptyListText;
-    //[SerializeField] CreateRoomDialogUI _createRoomDialog;
     //[SerializeField] JoinByCodeDialogUI _joinByCodeDialog;
+    [SerializeField] GameObject _tabButtonToHide;
 
     readonly List<LobbyEntryUI> _spawnedEntries = new List<LobbyEntryUI>();
     bool _isBusy;
@@ -55,16 +53,14 @@ public class LobbyListUI : MonoBehaviour
 
     //private void BindButtonEvents()
     //{
-        //_quickJoinButton.onClick.AddListener(OnQuickJoinClicked);
-        //_joinByCodeButton.onClick.AddListener(OnJoinByCodeClicked);
-        //_refreshButton.onClick.AddListener(RefreshLobbyList);
+    //_quickJoinButton.onClick.AddListener(OnQuickJoinClicked);
+    //_joinByCodeButton.onClick.AddListener(OnJoinByCodeClicked);
     //}
 
     //private void UnbindButtonEvents()
     //{
-        //_quickJoinButton.onClick.RemoveListener(OnQuickJoinClicked);
-        //_joinByCodeButton.onClick.RemoveListener(OnJoinByCodeClicked);
-        //_refreshButton.onClick.RemoveListener(RefreshLobbyList);
+    //_quickJoinButton.onClick.RemoveListener(OnQuickJoinClicked);
+    //_joinByCodeButton.onClick.RemoveListener(OnJoinByCodeClicked);
     //}
 
     private void BindLobbyManagerEvents()
@@ -165,10 +161,8 @@ public class LobbyListUI : MonoBehaviour
     private void SetBusy(bool busy)
     {
         _isBusy = busy;
-        //_createRoomButton.interactable = !busy;
         //_quickJoinButton.interactable = !busy;
         //_joinByCodeButton.interactable = !busy;
-        //_refreshButton.interactable = !busy;
         for (int i = 0; i < _spawnedEntries.Count; i++)
         {
             if (_spawnedEntries[i] != null) _spawnedEntries[i].SetInteractable(!busy);
@@ -188,10 +182,22 @@ public class LobbyListUI : MonoBehaviour
 
     private void ShowLobbyListPanel(bool show)
     {
-        _darkUIManager.OpenPanel("Multiplayer");
+        if (show)
+        {
+            _darkUIPanelMain.OpenPanel("Multiplayer");
+            TabButtonToShow();
+        }
+        else
+        {
+            _darkUIPanelMulti.OpenPanel("ROOM");
+            _tabButtonToHide.SetActive(false);
+            SetStatus(string.Empty);
+        }
         //_lobbyListPanel.SetActive(show);
-        _roomPanel.SetActive(!show);
+        //_roomPanel.SetActive(!show);
     }
+
+    public void TabButtonToShow() => _tabButtonToHide.SetActive(true);
 
     private void SetStatus(string message)
     {
