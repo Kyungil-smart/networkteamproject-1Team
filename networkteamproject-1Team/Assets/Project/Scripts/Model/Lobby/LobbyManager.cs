@@ -87,6 +87,7 @@ public class LobbyManager : MonoBehaviour
     private void OnDestroy()
     {
         Application.wantsToQuit -= OnWantsToQuit;
+
         if (Instance == this) Instance = null;
     }
 
@@ -96,7 +97,7 @@ public class LobbyManager : MonoBehaviour
         if (_session == null || _isQuitting) return true;
         _isQuitting = true;
         LeaveAndQuitAsync().Forget();
-        return false;   
+        return false;
     }
 
     private async UniTaskVoid LeaveAndQuitAsync()
@@ -506,19 +507,6 @@ public class LobbyManager : MonoBehaviour
     {
         UnbindSessionEvents(_session);
         _session = null;
-    }
-
-    private void StartRestartCooldownWatch()
-    {
-        if (_restartCooldownRoutine != null) StopCoroutine(_restartCooldownRoutine);
-        _restartCooldownRoutine = StartCoroutine(WaitForRestartCooldownThenNotify());
-    }
-
-    private IEnumerator WaitForRestartCooldownThenNotify()
-    {
-        yield return new WaitForSeconds(_settings.GameRestartCooldownSec);
-        _restartCooldownRoutine = null;
-        OnRestartCooldownEnded?.Invoke();
     }
 
     private void SetSingleton()

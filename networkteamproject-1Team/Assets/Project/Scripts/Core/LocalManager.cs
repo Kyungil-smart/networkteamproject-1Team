@@ -1,7 +1,8 @@
-using System;
-using UnityEngine;
-using Unity.Netcode;
 using Cysharp.Threading.Tasks;
+using System;
+using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // 자동생성 싱글톤, 로컬정보 관리
 public partial class LocalManager : MonoBehaviour

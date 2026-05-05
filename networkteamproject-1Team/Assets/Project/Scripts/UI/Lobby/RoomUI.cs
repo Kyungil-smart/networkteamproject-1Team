@@ -1,13 +1,15 @@
+using Michsky.UI.Dark;
 using System.Collections.Generic;
+using TMPro;
+using Unity.Netcode;
+using Unity.Services.Multiplayer;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Services.Multiplayer;
-using TMPro;
 
 /// <summary>
 /// 룸(방) 내부 UI. 플레이어 슬롯 + 레디/나가기 버튼 + 상태 메시지
 /// </summary>
-public class RoomUI : MonoBehaviour
+public class RoomUI : NetworkBehaviour
 {
     [SerializeField] LobbySettings _settings;
     [SerializeField] TMP_Text _roomNameText;
@@ -18,6 +20,8 @@ public class RoomUI : MonoBehaviour
     [SerializeField] TMP_Text _statusText;
 
     [SerializeField] Sprite[] _sourceImages;
+    [SerializeField] MainPanelManager _darkUIPanelMulti;
+    [SerializeField] GameObject _panelToHideAtGame;
 
     bool _isLocalPlayerReady;
     bool _isProcessingReady;
@@ -43,27 +47,25 @@ public class RoomUI : MonoBehaviour
         _isLocalPlayerReady = false;
     }
 
+    public override void OnNetworkSpawn()
+    {
+        LobbyManager.Instance.OnGameStarting += OnGameStarting;
+    }
+    public override void OnNetworkDespawn()
+    {
+        LobbyManager.Instance.OnGameStarting -= OnGameStarting;
+    }
+
+
     private void BindEvents()
     {
-        BindLobbyManagerEvents();
+        LobbyManager.Instance.OnSessionUpdated += Refresh;
+        LobbyManager.Instance.OnRestartCooldownEnded += RefreshReadyButton;
     }
 
     private void UnbindEvents()
     {
-        UnbindLobbyManagerEvents();
-    }
-
-    private void BindLobbyManagerEvents()
-    {
-        LobbyManager.Instance.OnSessionUpdated += Refresh;
-        LobbyManager.Instance.OnGameStarting += OnGameStarting;
-        LobbyManager.Instance.OnRestartCooldownEnded += RefreshReadyButton;
-    }
-
-    private void UnbindLobbyManagerEvents()
-    {
         LobbyManager.Instance.OnSessionUpdated -= Refresh;
-        LobbyManager.Instance.OnGameStarting -= OnGameStarting;
         LobbyManager.Instance.OnRestartCooldownEnded -= RefreshReadyButton;
     }
 
@@ -217,11 +219,21 @@ public class RoomUI : MonoBehaviour
         await LobbyManager.Instance.LeaveSessionAsync();
     }
 
-    private void OnGameStarting()
+    void OnGameStarting()
+    {
+        GameStartingClientRpc();
+    }
+
+    [ClientRpc]
+    void GameStartingClientRpc()
     {
         _statusText.text = "게임에 입장합니다...";
         _readyButton.interactable = false;
+        _panelToHideAtGame.SetActive(false);
+        _darkUIPanelMulti.OpenPanel("LOADING");
+        TransitionControl.Instance.PlayIn();
     }
+
 
     public void CopyLobbyCodeToClipboard()
     {
