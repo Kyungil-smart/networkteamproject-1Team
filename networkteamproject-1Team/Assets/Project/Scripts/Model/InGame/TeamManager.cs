@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Cysharp.Threading.Tasks;
 using Battle;
 
 // 플레이어 스폰과 팀 배정 담당
@@ -64,9 +65,9 @@ public class TeamManager : NetworkBehaviour
     {
         if (clientsTimedOut != null && clientsTimedOut.Count > 0)
         {
-            Debug.LogWarning($"[TeamManager] {clientsTimedOut.Count}명 씬 로드 timeout 발생");
             ShowTimeoutClientRpc(clientsTimedOut.Count);
-            LobbyManager.Instance.ReturnToRoomAsync().Forget();
+            LobbyManager.Instance.LeaveSessionAsync().Forget();
+            SceneManager.LoadScene(0);
             return;
         }
 

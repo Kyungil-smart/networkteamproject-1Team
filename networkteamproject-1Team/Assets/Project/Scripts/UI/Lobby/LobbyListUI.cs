@@ -66,13 +66,11 @@ public class LobbyListUI : MonoBehaviour
     private void BindLobbyManagerEvents()
     {
         LobbyManager.Instance.OnSessionUpdated += OnSessionUpdated;
-        LobbyManager.Instance.OnSessionLeft += OnSessionLeft;
     }
 
     private void UnbindLobbyManagerEvents()
     {
         LobbyManager.Instance.OnSessionUpdated -= OnSessionUpdated;
-        LobbyManager.Instance.OnSessionLeft -= OnSessionLeft;
     }
 
     public async void RefreshLobbyList()
@@ -172,12 +170,6 @@ public class LobbyListUI : MonoBehaviour
     private void OnSessionUpdated(ISession session)
     {
         if (session != null) ShowLobbyListPanel(false);
-    }
-
-    private void OnSessionLeft()
-    {
-        ShowLobbyListPanel(true);
-        RefreshLobbyList();
     }
 
     private void ShowLobbyListPanel(bool show)

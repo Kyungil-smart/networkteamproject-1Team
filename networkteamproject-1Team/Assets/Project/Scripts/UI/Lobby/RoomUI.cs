@@ -15,14 +15,17 @@ public class RoomUI : MonoBehaviour
     [SerializeField] List<RoomPlayerSlotUI> _playerSlots = new List<RoomPlayerSlotUI>();
     [SerializeField] Button _readyButton;
     [SerializeField] TMP_Text[] _readyButtonLabels;
-    [SerializeField] Button _leaveButton;
     [SerializeField] TMP_Text _statusText;
+
+    [SerializeField] Sprite[] _sourceImages;
 
     bool _isLocalPlayerReady;
     bool _isProcessingReady;
+    string _sessionCode;
 
     private void OnEnable()
     {
+        AssignSlotBackgrounds();
         BindEvents();
         ResetInteractables();
     }
@@ -36,33 +39,18 @@ public class RoomUI : MonoBehaviour
     {
         // 이전 진입에서 OnLeaveClicked / OnGameStarting에 의해 false로 남아있을 수 있어 재진입 시 복구
         _readyButton.interactable = true;
-        _leaveButton.interactable = true;
         _isProcessingReady = false;
         _isLocalPlayerReady = false;
     }
 
     private void BindEvents()
     {
-        BindButtonEvents();
         BindLobbyManagerEvents();
     }
 
     private void UnbindEvents()
     {
-        UnbindButtonEvents();
         UnbindLobbyManagerEvents();
-    }
-
-    private void BindButtonEvents()
-    {
-        _readyButton.onClick.AddListener(OnReadyClicked);
-        _leaveButton.onClick.AddListener(OnLeaveClicked);
-    }
-
-    private void UnbindButtonEvents()
-    {
-        _readyButton.onClick.RemoveListener(OnReadyClicked);
-        _leaveButton.onClick.RemoveListener(OnLeaveClicked);
     }
 
     private void BindLobbyManagerEvents()
@@ -79,6 +67,15 @@ public class RoomUI : MonoBehaviour
         LobbyManager.Instance.OnRestartCooldownEnded -= RefreshReadyButton;
     }
 
+    private void AssignSlotBackgrounds()
+    {
+        for (int i = 0; i < _playerSlots.Count; i++)
+        {
+            Image img = _playerSlots[i].GetComponent<Image>();
+            img.sprite = _sourceImages[i % _sourceImages.Length];
+        }
+    }
+
     private void Refresh(ISession session)
     {
         if (session == null) return;
@@ -87,6 +84,7 @@ public class RoomUI : MonoBehaviour
         {
             _lobbyCodeTexts[i].text = $"Join Code: {session.Code}";
         }
+        _sessionCode = session.Code;
         RefreshPlayerSlots(session);
         RefreshReadyButton();
         RefreshStatusText(session);
@@ -124,6 +122,7 @@ public class RoomUI : MonoBehaviour
         string readyValue = LobbyManager.GetPlayerProperty(player, LobbyConstants.KEY_PLAYER_READY);
         bool isReady = readyValue == LobbyConstants.VALUE_TRUE;
         bool isHost = player.Id == session.Host;
+        _playerSlots[index].gameObject.SetActive(true);
         _playerSlots[index].SetPlayer(playerName, isReady, isHost);
     }
 
@@ -141,7 +140,6 @@ public class RoomUI : MonoBehaviour
         {
             _readyButton.interactable = !isHost || LobbyManager.Instance.CanHostStartGame;
         }
-        _leaveButton.interactable = true;
     }
 
     private void RefreshStatusText(ISession session)
@@ -187,7 +185,7 @@ public class RoomUI : MonoBehaviour
         return count;
     }
 
-    private async void OnReadyClicked()
+    public async void OnReadyClicked()
     {
         if (_isProcessingReady) return;
         _isProcessingReady = true;
@@ -212,7 +210,10 @@ public class RoomUI : MonoBehaviour
 
     public async void OnLeaveClicked()
     {
-        _leaveButton.interactable = false;
+        for (int i = 0; i < _playerSlots.Count; i++)
+        {
+            _playerSlots[i].SetEmpty();
+        }
         await LobbyManager.Instance.LeaveSessionAsync();
     }
 
@@ -220,6 +221,14 @@ public class RoomUI : MonoBehaviour
     {
         _statusText.text = "게임에 입장합니다...";
         _readyButton.interactable = false;
-        _leaveButton.interactable = false;
+    }
+
+    public void CopyLobbyCodeToClipboard()
+    {
+        if (!string.IsNullOrEmpty(_sessionCode))
+        {
+            GUIUtility.systemCopyBuffer = _sessionCode;
+            _statusText.text = "코드가 클립보드에 복사되었습니다";
+        }
     }
 }

@@ -62,7 +62,7 @@ public class TeamA : TeamBase
     {
         nameText.text = newName;
 
-        // 내가B면 A팀(괴물)을 빨간색으로, B팀(사람)을 흰색으로 표시
+        // 내가B면 A팀(괴물)을 빨간색으로 표시
         if (LocalManager.Instance.IamB)
         {
             nameText.color = Color.red;

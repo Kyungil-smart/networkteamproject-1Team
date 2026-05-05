@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Michsky.UI.Dark;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager Instance { get; private set; }
 
+    public MainPanelManager darkUIPanelMain; // dark UI
     [SerializeField] LobbySettings _settings;
     [SerializeField] TMP_InputField _playerNameInput;
 
@@ -69,7 +71,6 @@ public class LobbyManager : MonoBehaviour
     }
 
     public event Action<ISession> OnSessionUpdated;
-    public event Action OnSessionLeft;
     public event Action OnGameStarting;
 
     /// <summary>
@@ -346,7 +347,7 @@ public class LobbyManager : MonoBehaviour
             await host.SavePropertiesAsync();
             OnGameStarting?.Invoke();
 
-            if (!SceneLoader.LoadNetworked(SceneId.Game))
+            if (!SceneLoader.LoadNetworked(SceneId.Map1))
             {
                 _isStartingGame = false;
                 return false;
@@ -358,47 +359,6 @@ public class LobbyManager : MonoBehaviour
             Debug.LogError($"LobbyManager: 호스트 게임 시작 실패: {e.Message}");
             _isStartingGame = false;
             return false;
-        }
-    }
-
-    /// <summary>
-    /// 게임 종료 후 현재 세션을 유지한 채 룸 화면으로 복귀
-    /// </summary>
-    public async UniTaskVoid ReturnToRoomAsync()
-    {
-        _isStartingGame = false;
-        _lastGameEndRealtime = Time.realtimeSinceStartup;
-        StartRestartCooldownWatch();
-
-        if (IsHost && _session != null)
-        {
-            try
-            {
-                IHostSession host = _session.AsHost();
-                host.IsLocked = false;
-                await host.SavePropertiesAsync();
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"LobbyManager: 게임 종료 후 잠금 해제 실패: {e.Message}");
-            }
-        }
-
-        // 모든 멤버: 자기 ready 해제. 다른 플레이어 PlayerProperty는 host도 직접 못 바꾸므로 각자 해제
-        try
-        {
-            await UpdateLocalReadyPropertyAsync(false);
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"LobbyManager: 레디 해제 실패: {e.Message}");
-        }
-
-        OnSessionUpdated?.Invoke(_session);
-
-        if (IsHost)
-        {
-            SceneLoader.LoadNetworked(SceneId.Lobby);
         }
     }
 
@@ -419,7 +379,6 @@ public class LobbyManager : MonoBehaviour
         {
             Debug.LogWarning($"LobbyManager: 퇴장 중 예외: {e.Message}");
         }
-        OnSessionLeft?.Invoke();
     }
 
     // 진입 전 NGO 잔재 정리 (이전 시도 흔적이 남으면 다음 StartHost/StartClient 가 깨질 수 있음).
@@ -547,7 +506,6 @@ public class LobbyManager : MonoBehaviour
     {
         UnbindSessionEvents(_session);
         _session = null;
-        OnSessionLeft?.Invoke();
     }
 
     private void StartRestartCooldownWatch()
@@ -578,5 +536,10 @@ public class LobbyManager : MonoBehaviour
     {
         string playerName = _playerNameInput.text;
         return string.IsNullOrWhiteSpace(playerName) ? $"Player{UnityEngine.Random.Range(100, 1000)}" : playerName;
+    }
+
+    public void CloseDarkUI()
+    {
+        darkUIPanelMain.OpenFirstTab();
     }
 }

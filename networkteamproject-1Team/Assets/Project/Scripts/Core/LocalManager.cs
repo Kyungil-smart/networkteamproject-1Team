@@ -1,6 +1,7 @@
 using System;
-using Unity.Netcode;
 using UnityEngine;
+using Unity.Netcode;
+using Cysharp.Threading.Tasks;
 
 // 자동생성 싱글톤, 로컬정보 관리
 public partial class LocalManager : MonoBehaviour
@@ -43,6 +44,9 @@ public partial class LocalManager : MonoBehaviour
         else
         {
             Debug.Log("[LocalManager] 서버와의 연결이 끊겼습니다."); // 자신 또는 서버 연결 해제 시
+            if (LobbyManager.Instance.darkUIPanelMain != null) LobbyManager.Instance.CloseDarkUI();
+
+            LobbyManager.Instance.LeaveSessionAsync().Forget();
         }
 
         // TODO: 연결해제 UI 처리
